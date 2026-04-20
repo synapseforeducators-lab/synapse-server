@@ -20,7 +20,7 @@ async function bootstrap() {
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
   });
   app.setGlobalPrefix('api/v1', {
-    // exclude: [{ path: '/', method: RequestMethod.GET }],
+    exclude: [{ path: '/', method: RequestMethod.GET }],
   });
   app.useGlobalPipes(
     new ValidationPipe({
