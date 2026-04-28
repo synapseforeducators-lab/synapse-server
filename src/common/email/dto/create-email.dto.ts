@@ -4,11 +4,6 @@ export class CreateEmailDto {
   @IsString()
   @IsNotEmpty()
   @IsEmail()
-  from: string;
-
-  @IsString()
-  @IsNotEmpty()
-  @IsEmail()
   to: string;
 
   @IsString()

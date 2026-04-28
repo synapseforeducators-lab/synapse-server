@@ -6,12 +6,12 @@ import {
   InternalServerErrorException,
 } from '@nestjs/common';
 import {
-  CompleteSignupDto,
   NewPasswordDto,
   ResetPasswordDto,
   SignupChannelType,
   SignupUserDto,
   UpdateProfileDto,
+  VerifySignupDto,
 } from './dto';
 import { UsersRepository } from './repository/users.repository';
 import * as bcrypt from 'bcryptjs';
@@ -30,132 +30,101 @@ import { ConfigService } from '@nestjs/config';
 import { SignupLoginEnum, VerificationCodeUserCase } from './enums/user.enum';
 import { UpdateNameDto } from './dto/update-name.dto';
 import { UpdateEmailDto } from './dto/update-email.dto';
-import { UpdatePasswordDto } from './dto/update-user-details.dto';
+import {
+  UpdatePasswordDto,
+  UpdateUserProfileDto,
+} from './dto/update-user-details.dto';
+import { EmailService } from 'src/common/email/email.service';
+import { CloudinaryService } from 'src/common/cloudinary/cloudinary.service';
 
 @Injectable()
 export class UsersService {
   constructor(
+    private cloudinaryService: CloudinaryService,
     private readonly usersRepository: UsersRepository,
-    private readonly smsService: SmsService,
+    private readonly emailService: EmailService,
     // private readonly dojahService: DojahService,
     private readonly configService: ConfigService,
   ) {}
 
-  async creatUser(signupUserDto: SignupUserDto) {
-    const { email, phone_number, channel } = signupUserDto;
+  async signup(signupUserDto: SignupUserDto) {
+    const { email } = signupUserDto;
 
-    if (channel === SignupChannelType.EMAIL) {
-      const emailExist = await this.usersRepository.findOne({
-        email: email,
-      });
+    const emailExist = await this.usersRepository.findOne({
+      email: email,
+    });
 
-      if (emailExist) {
-        if (emailExist?.email_verified)
-          throw new ForbiddenException(
-            'User with this email address exist, kindly login',
-          );
-
-        const { user, code } =
-          await this.usersRepository.signupExist(signupUserDto);
-
-        return { user, code };
-      }
-    }
-
-    if (channel === SignupChannelType.PHONE) {
-      const userResponse = await this.usersRepository.findOne({
-        phone_number: phoneNumberFormatter(phone_number),
-      });
-
-      // if (userResponse) {
-      //   if (userResponse?.phone_verified) {
-      //     return customResponse(
-      //       'User already exist',
-      //       SignupLoginEnum.AUTH_LOGIN,
-      //     );
-      //   }
-      //   const { user, code } =
-      //     await this.usersRepository.signupExist(signupUserDto);
-
-      //    customResponse(
-      //     'Account created, complete signup',
-      //     SignupLoginEnum.AUTH_SIGNUP,
-      //   );
-      // }
-
-      if (!userResponse) {
-        const { user, code } = await this.usersRepository.signUp(signupUserDto);
-
-        return { user, code, session: SignupLoginEnum.AUTH_SIGNUP };
-      }
-
-      if (userResponse?.phone_verified) {
-        return {
-          user: userResponse,
-          code: null,
-          session: SignupLoginEnum.AUTH_LOGIN,
-        };
-      }
+    if (emailExist) {
+      if (emailExist?.email_verified)
+        throw new ForbiddenException(
+          'User with this email address exist, kindly login',
+        );
 
       const { user, code } =
         await this.usersRepository.signupExist(signupUserDto);
 
-      return { user, code, session: SignupLoginEnum.AUTH_SIGNUP };
+      return { user, code };
     }
+
+    const { user, code } = await this.usersRepository.signup(signupUserDto);
+
+    return { user, code };
   }
 
-  // async resendPhoneNumberVerification(getUserByPhoneDto: GetUserByPhoneDto) {
-  //   const user = await this.usersRepository.findOne({
-  //     phone_number: getUserByPhoneDto.phone_number,
-  //   });
+  async resendEmailCodeVerification(getUserByEmailDto: GetUserByEmailDto) {
+    const user = await this.usersRepository.findOne({
+      email: getUserByEmailDto.email,
+    });
 
-  //   if (!user) throw new ForbiddenException('Something went wrong, Try again!');
+    if (!user) throw new ForbiddenException('user not found');
 
-  //   if (user.phone_verified)
-  //     throw new ForbiddenException('User phone number already verified');
+    if (user.email_verified)
+      throw new ForbiddenException('User phone number already verified');
 
-  //   if (
-  //     user.verification_token?.use_case !==
-  //     VerificationCodeUserCase.PHONE_VERIFICATION
-  //   )
-  //     throw new ForbiddenException('Something went wrong, Try again!');
+    if (
+      user.verification_token?.use_case !==
+      VerificationCodeUserCase.EMAIL_VERIFICATION
+    )
+      throw new ForbiddenException('Something went wrong, Try again!');
 
-  //   const code = otpGenerator(4);
+    const code = otpGenerator(6);
 
-  //   const updatedUser = await this.usersRepository.findOneAndUpdate(
-  //     {
-  //       phone_number: user.phone_number,
-  //     },
-  //     {
-  //       verification_token: {
-  //         code: await bcrypt.hash(code, 10),
-  //         expired_at: new Date(new Date().getTime() + 10 * 60000),
-  //         use_case: VerificationCodeUserCase.PHONE_VERIFICATION,
-  //       },
-  //     },
-  //   );
+    const updatedUser = await this.usersRepository.findOneAndUpdate(
+      {
+        email: user.email,
+      },
+      {
+        verification_token: {
+          code: await bcrypt.hash(code, 10),
+          expired_at: new Date(new Date().getTime() + 10 * 60000),
+          use_case: VerificationCodeUserCase.EMAIL_VERIFICATION,
+        },
+      },
+    );
 
-  //   return { user: updatedUser, code };
-  // }
+    return { user: updatedUser, code };
+  }
 
-  async completeSignup(completeSignupDto: CompleteSignupDto) {
-    const { code, phone_number, email } = completeSignupDto;
+  async verifySignup(verifySignupDto: VerifySignupDto) {
+    const { code, email } = verifySignupDto;
 
     const userResponse = await this.usersRepository.findOne({
-      phone_number: phoneNumberFormatter(phone_number),
+      email: email,
     });
+
     if (!userResponse) {
-      throw new BadRequestException('User not found');
+      throw new BadRequestException('User not found, signup');
     }
-    // if (user.phone_verified) {
-    //   throw new ForbiddenException('User phone number already verified');
-    // }
+
+    if (userResponse?.email_verified) {
+      throw new BadRequestException('Email already verified, login');
+    }
 
     if (
       userResponse.verification_token?.use_case !==
-      VerificationCodeUserCase.PHONE_VERIFICATION
+      VerificationCodeUserCase.EMAIL_VERIFICATION
     ) {
-      throw new ForbiddenException('Unable to verify phone, Try again!');
+      throw new ForbiddenException('Unable to verify email, Try again!');
     }
 
     const currentTime = new Date().getTime();
@@ -177,28 +146,17 @@ export class UsersService {
         'Invalid OTP. Please double-check the code and try again.',
       );
     }
-    if (email) {
-      const emailExists = await this.usersRepository.findOne({ email });
-      if (emailExists && emailExists.id !== userResponse.id) {
-        throw new BadRequestException('Email already exists');
-      }
-    }
 
-    const { user } = await this.usersRepository.createBuyerAccount(
-      completeSignupDto,
-      userResponse.id,
-    );
-
-
+    const { user } = await this.usersRepository.verifySignup(userResponse.id);
 
     return { user };
   }
 
   async newPassword(newPasswordDto: NewPasswordDto) {
-    const { code, phone_number } = newPasswordDto;
+    const { code, email } = newPasswordDto;
 
     const userResponse = await this.usersRepository.findOne({
-      phone_number: phoneNumberFormatter(phone_number),
+      email: email,
     });
     if (!userResponse) {
       throw new BadRequestException('User not found');
@@ -245,16 +203,16 @@ export class UsersService {
   }
 
   async validateUser(userLoginDto: UserLoginDto) {
-    const { phone_number, password } = userLoginDto;
+    const { email, password } = userLoginDto;
 
     /*
       Validate Phone number exist and password is valid
     */
     const user = await this.usersRepository.findOne({
-      phone_number: phoneNumberFormatter(phone_number),
+      email: email.trim(),
     });
 
-    console.log({ phone_number, password });
+    console.log({ email, password });
 
     if (!user) throw new BadRequestException('Invalid login Credentials');
 
@@ -266,25 +224,30 @@ export class UsersService {
     /*
       If Phone number not verified, Kindly send verification again
     */
-    if (!user.phone_verified) {
-      const code = otpGenerator(4);
+    if (!user.email_verified) {
+      const code = otpGenerator(6);
       await this.usersRepository.findOneAndUpdate(
         { id: user.id },
         {
           verification_token: {
             code: await bcrypt.hash(code, 10),
             expired_at: new Date(new Date().getTime() + 10 * 60000),
-            use_case: VerificationCodeUserCase.PHONE_VERIFICATION,
+            use_case: VerificationCodeUserCase.EMAIL_VERIFICATION,
           },
         },
       );
 
-      this.smsService
-        .phoneNumberVerification(user.phone_number, code)
-        .then()
-        .catch((error) => console.log({ error }));
+      const { data, error } = await this.emailService.send({
+        to: user.email,
+        subject: 'Signup Verfication Code',
+        html: `Hi ${user.first_name}, <br/> <br/> Enter the confirmation code you to very your account:  <br/><br/> <h2> ${code} </h2> `,
+      });
 
-      throw new ForbiddenException('phone number not verified, signup ');
+      console.log({ data, error });
+
+      return customResponse('Email not verified, verify email', {
+        SESSION: 'VERIFY_SIGNUP',
+      });
     }
 
     return user;
@@ -292,12 +255,10 @@ export class UsersService {
 
   async validateUserJwt(tokenPayload: TokenPayload) {
     return await this.usersRepository.findOne({
-      phone_number: tokenPayload.phone_number,
+      email: tokenPayload.email,
       id: tokenPayload.id,
     });
   }
-
-
 
   async updateEmail(user: User, updateEmailDto: UpdateEmailDto) {
     return await this.usersRepository.findOneAndUpdate(
@@ -306,6 +267,48 @@ export class UsersService {
       },
       updateEmailDto,
     );
+  }
+
+  async updateUserProfile(
+    user: User,
+    updateUserProfileDto: UpdateUserProfileDto,
+  ) {
+    const cleanedDto = Object.fromEntries(
+      Object.entries(updateUserProfileDto).filter(
+        ([_, value]) => value !== undefined,
+      ),
+    );
+    const userResponse = await this.usersRepository.findOneAndUpdate(
+      { id: user.id },
+      cleanedDto,
+    );
+
+    if (!userResponse)
+      throw new BadRequestException('Something went wrong, try again later');
+
+    delete userResponse.password;
+    delete userResponse.created_at;
+    delete userResponse.updated_at;
+    delete userResponse.id;
+    return userResponse;
+  }
+
+  async updateProfilePicture(user: User, file: Express.Multer.File) {
+    console.log(user, file);
+    const imgUrl = await this.cloudinaryService.uploadImageToCloudinary(file);
+    if (!imgUrl) throw new BadRequestException('unable to upload image');
+
+    const userResponse = await this.usersRepository.findOneAndUpdate(
+      { id: user.id },
+      {
+        profile_photo_url: imgUrl,
+      },
+    );
+    delete userResponse.created_at;
+    delete userResponse.updated_at;
+    delete userResponse.id;
+
+    return customResponse('Profile photo updated successfully', userResponse);
   }
 
   // async updateProfile(updateProfileDto: UpdateProfileDto, user: User) {
@@ -372,7 +375,7 @@ export class UsersService {
   //   });
   //   if (!user) throw new BadRequestException('Something went wrong, Try again');
 
-  //   const code = otpGenerator(4);
+  //   const code = otpGenerator(6);
 
   //   const updatedUser = await this.usersRepository.findOneAndUpdate(
   //     {
@@ -404,7 +407,7 @@ export class UsersService {
   //   )
   //     throw new ForbiddenException('Something went wrong, Try again!');
 
-  //   const code = otpGenerator(4);
+  //   const code = otpGenerator(6);
 
   //   const updatedUser = await this.usersRepository.findOneAndUpdate(
   //     {
@@ -508,12 +511,12 @@ export class UsersService {
   // }
 
   async resetPassword(resetPasswordDto: ResetPasswordDto) {
-    const { phone_number, channel } = resetPasswordDto;
-    const generatedCode = otpGenerator(5);
+    const { email } = resetPasswordDto;
+    const generatedCode = otpGenerator(6);
 
     const userResponse = await this.usersRepository.findOneAndUpdate(
       {
-        phone_number: phoneNumberFormatter(phone_number),
+        email: email,
       },
       {
         verification_token: {
@@ -538,7 +541,7 @@ export class UsersService {
       Validate Phone number exist and password is valid
     */
     const userResponse = await this.usersRepository.findOne({
-      phone_number: phoneNumberFormatter(user?.phone_number),
+      email: user?.email,
     });
 
     if (!userResponse)

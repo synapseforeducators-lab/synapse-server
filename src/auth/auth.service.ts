@@ -9,59 +9,49 @@ import { ConfigService, ConfigType } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import { UsersService } from 'src/user/user.service';
 import {
-  CompleteSignupDto,
   NewPasswordDto,
   ResetPasswordDto,
-  SignupChannelType,
   SignupUserDto,
+  VerifySignupDto,
 } from 'src/user/dto';
+import { customResponse } from 'src/common/util';
 import {
-  customResponse,
-  maskLastSixDigits,
-  phoneNumberFormatter,
-} from 'src/common/util';
-import { GetUserByPhoneDto } from 'src/user/dto/get-user.dto';
+  GetUserByEmailDto,
+  GetUserByPhoneDto,
+} from 'src/user/dto/get-user.dto';
 import { User } from 'src/user/entities/user.entity';
 import { TokenPayload } from 'src/common/interfaces';
-import { SmsService } from 'src/common/sms/sms.service';
 import refreshJwtConfig from './config/refresh-jwt.config';
 import { SignupLoginEnum } from 'src/user/enums/user.enum';
+import { EmailService } from 'src/common/email/email.service';
 
 @Injectable()
 export class AuthService {
   constructor(
     private readonly usersService: UsersService,
-    // private readonly emailService: EmailService,
     private readonly configService: ConfigService,
     private readonly jwtService: JwtService,
-    private readonly smsService: SmsService,
+    private readonly emailService: EmailService,
 
     @Inject(refreshJwtConfig.KEY)
     private refreshTokenConfig: ConfigType<typeof refreshJwtConfig>,
   ) {}
   async userSignUp(createUserDto: SignupUserDto) {
-    const { user, code, session } =
-      await this.usersService.creatUser(createUserDto);
-
-    console.log({ user, code, session });
-
-    if (session === SignupLoginEnum.AUTH_LOGIN) {
-      return customResponse('User already exist', SignupLoginEnum.AUTH_LOGIN);
-    }
+    const { user, code } = await this.usersService.signup(createUserDto);
 
     if (!user) throw new InternalServerErrorException('Something went wrong');
 
-    if (createUserDto.channel === SignupChannelType.PHONE) {
-      this.smsService
-        .phoneNumberVerification(user.phone_number, code)
-        .then()
-        .catch((error) => console.log({ error }));
-    }
+    console.log(code, user);
 
-    return customResponse(
-      'Account created, complete signup',
-      SignupLoginEnum.AUTH_SIGNUP,
-    );
+    const { data, error } = await this.emailService.send({
+      to: user.email,
+      subject: 'Signup Verfication Code',
+      html: `Hi ${user.first_name}, <br/> <br/> Enter the confirmation code you to very your account:  <br/><br/> <h2> ${code} </h2> `,
+    });
+
+    console.log({ data, error });
+
+    return customResponse('Account created, complete signup');
   }
 
   async resetPassword(resetPasswordDto: ResetPasswordDto) {
@@ -71,10 +61,10 @@ export class AuthService {
     if (!user) throw new InternalServerErrorException('Something went wrong');
 
     console.log({ code });
-    this.smsService
-      .phoneNumberVerification(user.phone_number, code)
-      .then()
-      .catch((error) => console.log({ error }));
+    // this.smsService
+    //   .phoneNumberVerification(user.phone_number, code)
+    //   .then()
+    //   .catch((error) => console.log({ error }));
 
     return customResponse(
       'Reset Pasword, code sent successfully',
@@ -84,10 +74,10 @@ export class AuthService {
   async newPassword(newPasswordDto: NewPasswordDto) {
     const { user } = await this.usersService.newPassword(newPasswordDto);
 
-    if (user.phone_verified) {
+    if (user.email_verified) {
       const tokenPayload: TokenPayload = {
         id: user.id,
-        phone_number: user.phone_number,
+        email: user.email,
       };
 
       const access_token = this.jwtService.sign(tokenPayload);
@@ -96,7 +86,6 @@ export class AuthService {
         this.refreshTokenConfig,
       );
 
-      delete user.currentOtp;
       delete user.created_at;
       delete user.updated_at;
       delete user.password;
@@ -115,13 +104,13 @@ export class AuthService {
     throw new BadRequestException('something weng wrong');
   }
 
-  async validateUserSignup(completeSignupDto: CompleteSignupDto) {
-    const { user } = await this.usersService.completeSignup(completeSignupDto);
+  async verifySignup(verifySignupDto: VerifySignupDto) {
+    const { user } = await this.usersService.verifySignup(verifySignupDto);
 
-    if (user.phone_verified) {
+    if (user.email_verified) {
       const tokenPayload: TokenPayload = {
         id: user.id,
-        phone_number: user.phone_number,
+        email: user.email,
       };
 
       const access_token = this.jwtService.sign(tokenPayload);
@@ -130,7 +119,6 @@ export class AuthService {
         this.refreshTokenConfig,
       );
 
-      delete user.currentOtp;
       delete user.created_at;
       delete user.updated_at;
 
@@ -150,31 +138,25 @@ export class AuthService {
     throw new BadRequestException('something weng wrong');
   }
 
-  // async userResendPhoneNumberVerification(
-  //   getUserByPhoneDto: GetUserByPhoneDto,
-  // ) {
-  //   const { code, user } =
-  //     await this.usersService.resendPhoneNumberVerification(getUserByPhoneDto);
+  async resendEmailCodeVerification(getUserByEmailDto: GetUserByEmailDto) {
+    const { code, user } =
+      await this.usersService.resendEmailCodeVerification(getUserByEmailDto);
 
-  //   console.log({ user, code });
+    console.log({ user, code });
 
-  //   if (!user) throw new InternalServerErrorException('Something went wrong');
+    if (!user) throw new InternalServerErrorException('Something went wrong');
 
-  //   // this.smsService
-  //   //   .phoneNumberVerification(user.phone_number, code)
-  //   //   .then()
-  //   //   .catch((error) => console.log({ error }));
+    const { data, error } = await this.emailService.send({
+      to: user.email,
+      subject: 'Signup Verfication Code',
+      html: `Hi ${user.first_name}, <br/> <br/> Enter the confirmation code you to very your account:  <br/><br/> <h2> ${code} </h2> `,
+    });
 
-  //   return customResponse(
-  //     'Please check your inbox for the OTP to complete the process.',
-  //   );
-  // }
-
-  // async userPhoneNumberVerification(
-  //   phoneVerificationDto: PhoneVerificationDto,
-  // ) {
-  //   return this.usersService.verifyPhoneNumber(phoneVerificationDto);
-  // }
+    console.log({ data, error });
+    return customResponse(
+      'Please check your inbox for the OTP to complete the process.',
+    );
+  }
 
   async validateUser(userLoginDto: UserLoginDto) {
     return this.usersService.validateUser(userLoginDto);
@@ -183,7 +165,7 @@ export class AuthService {
   async userLogin(user: User) {
     const tokenPayload: TokenPayload = {
       id: user.id,
-      phone_number: user.phone_number,
+      email: user.email,
     };
 
     console.log(tokenPayload);
@@ -193,11 +175,6 @@ export class AuthService {
       tokenPayload,
       this.refreshTokenConfig,
     );
-
-    // const buyer = await this.buyerService.findBuyerByUser(user.id);
-    // const seller = await this.sellerService.findSellerByUser(user.id);
-
-    // user.bvn = maskLastSixDigits(user.bvn);
 
     return customResponse('Logged In Successful', {
       token: {
@@ -210,7 +187,7 @@ export class AuthService {
   async refreshToken(user: User) {
     const tokenPayload: TokenPayload = {
       id: user.id,
-      phone_number: user.phone_number,
+      email: user.email,
     };
 
     const access_token = this.jwtService.sign(tokenPayload);

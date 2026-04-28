@@ -1,5 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import {
+  IsAlpha,
   IsEmail,
   IsEnum,
   IsNotEmpty,
@@ -16,33 +17,30 @@ export enum SignupChannelType {
 }
 
 export class SignupUserDto {
-  @ApiProperty({ enum: SignupChannelType })
-  @IsEnum(SignupChannelType)
-  channel: SignupChannelType;
+  @ApiProperty()
+  @IsNotEmpty()
+  @IsAlpha()
+  @Length(3, 30)
+  first_name: string;
 
-  @ApiProperty({ required: false })
-  @ValidateIf((o) => o.channel === SignupChannelType.PHONE)
-  @IsPhoneNumber()
-  phone_number: string;
+  @ApiProperty()
+  @IsNotEmpty()
+  @IsAlpha()
+  @Length(3, 30)
+  last_name: string;
 
-  @ApiProperty({ required: false })
-  @ValidateIf((o) => o.channel === SignupChannelType.EMAIL)
+  @ApiProperty()
   @IsEmail()
+  @IsNotEmpty()
   email: string;
+
+  @ApiProperty()
+  @IsStrongPassword()
+  password: string;
 }
 
 export class ResetPasswordDto {
-  @ApiProperty({ enum: SignupChannelType })
-  @IsEnum(SignupChannelType)
-  channel: SignupChannelType;
-
-  @ApiProperty({ required: false })
-  @ValidateIf((o) => o.channel === SignupChannelType.PHONE)
-  @IsPhoneNumber()
-  phone_number: string;
-
-  @ApiProperty({ required: false })
-  @ValidateIf((o) => o.channel === SignupChannelType.EMAIL)
+  @ApiProperty()
   @IsEmail()
   email: string;
 }
@@ -51,12 +49,12 @@ export class NewPasswordDto {
   @ApiProperty()
   @IsNotEmpty()
   @IsNumberString()
-  @Length(5, 5)
+  @Length(6, 6)
   code: string;
 
   @ApiProperty()
-  @IsPhoneNumber()
-  phone_number: string;
+  @IsEmail()
+  email: string;
 
   @ApiProperty()
   @IsStrongPassword()

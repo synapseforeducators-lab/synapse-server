@@ -9,6 +9,8 @@ import { AuthModule } from './auth/auth.module';
 import { SmsModule } from './common/sms/sms.module';
 import { CloudinaryModule } from './common/cloudinary/cloudinary.module';
 import { EmailModule } from './common/email/email.module';
+import { TemplateModule } from './template/template.module';
+import { SupportModule } from './support/support.module';
 
 @Module({
   imports: [
@@ -34,6 +36,8 @@ import { EmailModule } from './common/email/email.module';
     SmsModule,
     CloudinaryModule,
     EmailModule,
+    TemplateModule,
+    SupportModule,
   ],
   controllers: [AppController],
   providers: [AppService],

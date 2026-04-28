@@ -14,10 +14,10 @@ export class EmailService {
   }
 
   async send(createEmailDto: CreateEmailDto) {
-    const { from, to, subject, html } = createEmailDto;
+    const { to, subject, html } = createEmailDto;
 
     return await this.resend.emails.send({
-      from,
+      from: 'onboarding@resend.dev',
       to,
       subject,
       html,

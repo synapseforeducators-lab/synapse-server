@@ -10,15 +10,16 @@ import { AuthService } from './auth.service';
 
 import { ApiBearerAuth, ApiBody, ApiTags } from '@nestjs/swagger';
 import {
-  CompleteSignupDto,
   NewPasswordDto,
   ResetPasswordDto,
   SignupUserDto,
+  VerifySignupDto,
 } from 'src/user/dto';
 import { LocalAuthGuard } from './guards/local-auth/local-auth.guard';
 import { CurrentUser } from 'src/common/decorators';
 import { User } from 'src/user/entities/user.entity';
 import { RefreshJwtAuthGuard } from './guards/refresh-auth/refresh-auth.guard';
+import { GetUserByEmailDto } from 'src/user/dto/get-user.dto';
 
 @ApiTags('Auth')
 @Controller('auth')
@@ -44,16 +45,21 @@ export class AuthController {
   }
 
   @HttpCode(HttpStatus.OK)
-  @Post('/signup-complete')
-  completeSignup(@Body() completeSignupDto: CompleteSignupDto) {
-    return this.authService.validateUserSignup(completeSignupDto);
+  @Post('/signup/verify')
+  verifySignup(@Body() verifySignupDto: VerifySignupDto) {
+    return this.authService.verifySignup(verifySignupDto);
+  }
+  @HttpCode(HttpStatus.OK)
+  @Post('/signup/resend')
+  resendEmailCodeVerification(@Body() getUserByEmailDto: GetUserByEmailDto) {
+    return this.authService.resendEmailCodeVerification(getUserByEmailDto);
   }
 
   @ApiBody({
     schema: {
       type: 'object',
       properties: {
-        phone_number: { type: 'string' },
+        email: { type: 'string' },
         password: { type: 'string' },
       },
     },

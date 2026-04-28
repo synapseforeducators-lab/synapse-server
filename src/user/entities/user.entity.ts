@@ -1,25 +1,42 @@
-import { Column, Entity, Generated, Index, OneToMany, OneToOne } from 'typeorm';
+import {
+  BeforeInsert,
+  Column,
+  Entity,
+  Generated,
+  Index,
+  JoinColumn,
+  ManyToOne,
+  OneToMany,
+  OneToOne,
+} from 'typeorm';
 import { AbstractEntity } from '../../common';
 import { Role } from '../enums/role.enum';
 import { VerificationCodeUserCase } from '../enums/user.enum';
-
+import { School } from './school.entity';
 
 @Entity()
 export class User extends AbstractEntity<User> {
   @Column({ type: 'text', nullable: true })
-  password?: string;
+  password: string;
 
-  @Index()
-  @Column({ type: 'text', unique: true, nullable: true })
-  phone_number?: string;
-
-  @Index()
-  @Column({ type: 'text', unique: true, nullable: true })
-  email?: string;
+  @Column({ type: 'text', nullable: true })
+  profile_photo_url?: string;
 
   @Index()
   @Column({ type: 'text', nullable: true })
-  currentOtp?: string;
+  first_name: string;
+
+  @Index()
+  @Column({ type: 'text', nullable: true })
+  last_name: string;
+
+  @Index()
+  @Column({ type: 'text', unique: true, nullable: true })
+  email: string;
+
+  @Index()
+  @Column({ type: 'text', unique: true, nullable: true })
+  phone_number: string;
 
   @Column({ type: 'jsonb', nullable: true })
   verification_token?: {
@@ -39,14 +56,14 @@ export class User extends AbstractEntity<User> {
   @Column({ type: 'boolean', nullable: false, default: false })
   email_verified: boolean;
 
-  @Column({ type: 'boolean', nullable: false, default: false })
-  phone_verified: boolean;
+  @ManyToOne(() => School, (school) => school.users)
+  @JoinColumn()
+  school: School;
 
-  @Column({ type: 'boolean', nullable: false, default: false })
-  isBuyer: boolean;
-
-  @Column({ type: 'boolean', nullable: false, default: false })
-  isFarmer: boolean;
-
-
+  @BeforeInsert()
+  async updateName() {
+    this.first_name = this.first_name.toLowerCase().trim();
+    this.last_name = this.last_name.toLowerCase().trim();
+    this.email = this.email.toLowerCase().trim();
+  }
 }

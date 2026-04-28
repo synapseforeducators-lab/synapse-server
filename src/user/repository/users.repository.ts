@@ -6,13 +6,12 @@ import { Injectable, Logger } from '@nestjs/common';
 import * as bcrypt from 'bcryptjs';
 import { otpGenerator, phoneNumberFormatter } from 'src/common/util';
 import {
-  CompleteSignupDto,
   NewPasswordDto,
   SignupChannelType,
   SignupUserDto,
+  VerifySignupDto,
 } from '../dto';
 import { VerificationCodeUserCase } from '../enums/user.enum';
-
 
 @Injectable()
 export class UsersRepository extends AbstractRepository<User> {
@@ -26,20 +25,21 @@ export class UsersRepository extends AbstractRepository<User> {
     super(usersRepository, entityManager);
   }
 
-  async signUp(createUserDto: SignupUserDto) {
+  async signup(createUserDto: SignupUserDto) {
+    const { first_name, last_name, email, password } = createUserDto;
     let user: User;
-    const code = otpGenerator(5);
+    const code = otpGenerator(6);
 
-    const useCase =
-      createUserDto.channel === SignupChannelType.EMAIL
-        ? VerificationCodeUserCase.EMAIL_VERIFICATION
-        : VerificationCodeUserCase.PHONE_VERIFICATION;
+    const useCase = VerificationCodeUserCase.EMAIL_VERIFICATION;
 
     // Build the query dynamically
     await this.entityManager.transaction(
       async (transactionalEntityManager: EntityManager) => {
         user = await transactionalEntityManager.save(User, {
-          phone_number: phoneNumberFormatter(createUserDto.phone_number),
+          first_name,
+          last_name,
+          email,
+          password: await bcrypt.hash(password, 10),
           verification_token: {
             code: await bcrypt.hash(code, 10),
             expired_at: new Date(new Date().getTime() + 10 * 60000),
@@ -60,14 +60,11 @@ export class UsersRepository extends AbstractRepository<User> {
     //     ? 'email'
     //     : 'phone_number';
 
-    const useCase =
-      createUserDto.channel === SignupChannelType.EMAIL
-        ? VerificationCodeUserCase.EMAIL_VERIFICATION
-        : VerificationCodeUserCase.PHONE_VERIFICATION;
+    const useCase = VerificationCodeUserCase.EMAIL_VERIFICATION;
 
     // Build the query dynamically
     const query = {
-      phone_number: phoneNumberFormatter(createUserDto.phone_number),
+      email: phoneNumberFormatter(createUserDto.email),
     };
 
     // Update the verification token and get the updated user
@@ -81,45 +78,21 @@ export class UsersRepository extends AbstractRepository<User> {
     return { code, user };
   }
 
-  async createBuyerAccount(
-    completeSignupDto: CompleteSignupDto,
-    userId: string,
-  ) {
-    // const user = await this.repository.update(
-    //   { phone_number: phoneNumberFormatter(completeSignupDto.phone_number) },
-    //   {
-    //     email: completeSignupDto.email,
-    //     password: await bcrypt.hash(completeSignupDto.password, 10),
-    //   },
-    // );
-
+  async verifySignup(userId: string) {
     let user: User;
-    // let buyer: Buyer;
     await this.entityManager.transaction(
       async (transactionalEntityManager: EntityManager) => {
         await transactionalEntityManager.update(
           User,
           { id: userId },
           {
-            email: completeSignupDto.email,
-            isBuyer: true,
-            password: await bcrypt.hash(completeSignupDto.password, 10),
-            phone_verified: true,
+            email_verified: true,
             verification_token: null,
           },
         );
         user = await transactionalEntityManager.findOne(User, {
           where: { id: userId },
         });
-
-        // buyer = await transactionalEntityManager.save(Buyer, {
-        //   first_name: completeSignupDto.first_name,
-        //   last_name: completeSignupDto.last_name,
-        //   user: user,
-        // });
-        // await transactionalEntityManager.save(Seller, {
-        //   user: user,
-        // });
       },
     );
     return { user };
@@ -150,6 +123,6 @@ export class UsersRepository extends AbstractRepository<User> {
         // });
       },
     );
-    return { user};
+    return { user };
   }
 }

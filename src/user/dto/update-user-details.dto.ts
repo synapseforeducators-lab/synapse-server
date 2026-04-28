@@ -41,34 +41,7 @@ export class UpdateUserProfileDto {
   @ApiProperty()
   @IsOptional()
   @IsString()
-  postal_address: string;
-
-  @ApiProperty()
-  @IsOptional()
-  @IsString()
-  state: string;
-
-  @ApiProperty()
-  @IsOptional()
-  @IsString()
-  city: string;
-
-  @ApiProperty()
-  @IsOptional()
-  @IsString()
-  ward: string;
-
-  @ApiProperty()
-  @IsOptional()
-  @IsString()
-  dob: string;
-
-  @ApiProperty()
-  @IsOptional()
-  @IsString()
-  @ApiProperty({ enum: Gender })
-  @IsEnum(Gender)
-  gender: Gender;
+  phone_number: string;
 }
 
 export class UpdatePasswordDto {
