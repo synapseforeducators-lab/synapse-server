@@ -1,0 +1,22 @@
+export enum Gender {
+  MALE = 'MALE',
+  FEMALE = 'FEMALE',
+}
+
+export enum IdVerificationType {
+  BVN = 'BVN',
+  NIN = 'NIN',
+}
+
+export enum VerificationCodeUserCase {
+  EMAIL_VERIFICATION = 'EMAIL_VERIFICATION',
+  PASSWORD_RESET = 'PASSWORD_RESET',
+  PHONE_VERIFICATION = 'PHONE_VERIFICATION',
+  OTP_LOGIN_VERIFICATION = 'OTP_LOGIN_VERIFICATION',
+}
+
+export enum SignupLoginEnum {
+  AUTH_LOGIN = 'AUTH_LOGIN',
+  AUTH_SIGNUP = 'AUTH_SIGNUP',
+  RESET_PASSWORD = 'RESET_PASSWORD',
+}

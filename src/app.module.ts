@@ -3,6 +3,12 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { ConfigModule } from '@nestjs/config';
 import * as Joi from 'joi';
+import { DatabaseModule } from './common';
+import { UserModule } from './user/user.module';
+import { AuthModule } from './auth/auth.module';
+import { SmsModule } from './common/sms/sms.module';
+import { CloudinaryModule } from './common/cloudinary/cloudinary.module';
+import { EmailModule } from './common/email/email.module';
 
 @Module({
   imports: [
@@ -15,8 +21,19 @@ import * as Joi from 'joi';
         DB_PASS: Joi.string().required(),
         PORT: Joi.number().required(),
         DB_SYNCHRONIZE: Joi.boolean().required(),
+        JWT_SECRET: Joi.string().required(),
+        JWT_EXPIRE_IN: Joi.string().required(),
+        REFRESH_JWT_SECRET: Joi.string().required(),
+        REFRESH_JWT_EXPIRE_IN: Joi.string().required(),
       }),
     }),
+    DatabaseModule,
+
+    UserModule,
+    AuthModule,
+    SmsModule,
+    CloudinaryModule,
+    EmailModule,
   ],
   controllers: [AppController],
   providers: [AppService],
