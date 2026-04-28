@@ -20,7 +20,6 @@ import { CurrentUser } from 'src/common/decorators';
 
 @ApiTags('Templates')
 @ApiBearerAuth()
-@Controller('users')
 @UseGuards(JwtAuthGuard)
 @Controller('templates')
 export class TemplateController {

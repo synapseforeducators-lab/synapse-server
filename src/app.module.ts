@@ -11,6 +11,7 @@ import { CloudinaryModule } from './common/cloudinary/cloudinary.module';
 import { EmailModule } from './common/email/email.module';
 import { TemplateModule } from './template/template.module';
 import { SupportModule } from './support/support.module';
+import { CurriculumModule } from './curriculum/curriculum.module';
 
 @Module({
   imports: [
@@ -38,6 +39,7 @@ import { SupportModule } from './support/support.module';
     EmailModule,
     TemplateModule,
     SupportModule,
+    CurriculumModule,
   ],
   controllers: [AppController],
   providers: [AppService],
