@@ -37,6 +37,7 @@ export class CurriculumRepository extends AbstractRepository<Curriculum> {
     try {
       const { items = [], ...curriculumData } = createCurriculumDto;
 
+      console.log(createCurriculumDto);
       const curriculumItems = items.map((itemDto, index) =>
         this.entityManager.create(CurriculumItem, {
           ...itemDto,
@@ -44,7 +45,7 @@ export class CurriculumRepository extends AbstractRepository<Curriculum> {
         }),
       );
 
-      const curriculum = this.repository.create({
+      const curriculum = await this.repository.create({
         ...curriculumData,
         school: user.school ?? null,
         createdBy: user,

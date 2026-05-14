@@ -176,6 +176,12 @@ export class AuthService {
       this.refreshTokenConfig,
     );
 
+    delete user.password;
+    delete user.created_at;
+    delete user.updated_at;
+    delete user.id;
+    delete user.verification_token;
+
     return customResponse('Logged In Successful', {
       token: {
         access_token,

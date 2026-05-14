@@ -44,19 +44,21 @@ async function bootstrap() {
   );
   const configService = app.get(ConfigService);
 
-  const ap = configService.get('PORT') || 9000;
-  console.log(`before Server running on http://localhost:${ap}`);
-
+  const port = configService.get('PORT');
+  console.log(`before Server running on http://localhost:${port}`);
+  const baseUrl = configService.get('BASE_URL') || `http://localhost:${port}`;
   const apiDocConfig = new DocumentBuilder()
     .setTitle('Synapse API')
     .setDescription('This api documentation is for Synapse App API')
     .setVersion('1.0')
     .addTag('Synapse App')
     .addBearerAuth()
+    .addServer(`${baseUrl}/api/v1`)
     .build();
-  const apiDoc = SwaggerModule.createDocument(app, apiDocConfig);
+  const apiDoc = SwaggerModule.createDocument(app, apiDocConfig, {
+    ignoreGlobalPrefix: true,
+  });
   SwaggerModule.setup('api', app, apiDoc);
-  const port = configService.get('PORT');
   console.log('STEP 2 - after create');
 
   await app.listen(port);

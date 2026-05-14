@@ -11,7 +11,7 @@ import {
   ValidateNested,
 } from 'class-validator';
 import { SectionType } from '../entities/section.entity';
-import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import { ApiBody, ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 
 export class CreateTemplateSectionDto {
   @ApiProperty()
@@ -41,8 +41,7 @@ export class CreateTemplateDto {
   @IsNotEmpty()
   name: string;
 
-  @ApiProperty()
-  @IsArray()
+  @ApiProperty({ type: () => CreateTemplateSectionDto, isArray: true })
   @ValidateNested({ each: true })
   @Type(() => CreateTemplateSectionDto)
   sections: CreateTemplateSectionDto[];

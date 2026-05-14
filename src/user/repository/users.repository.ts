@@ -64,7 +64,7 @@ export class UsersRepository extends AbstractRepository<User> {
 
     // Build the query dynamically
     const query = {
-      email: phoneNumberFormatter(createUserDto.email),
+      email: createUserDto.email,
     };
 
     // Update the verification token and get the updated user

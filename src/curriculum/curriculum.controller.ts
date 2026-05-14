@@ -16,8 +16,10 @@ import { UpdateCurriculumDto } from './dto/update-curriculum.dto';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth/jwt-auth.guard';
 import { CurrentUser } from 'src/common/decorators';
 import { User } from 'src/user/entities/user.entity';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 
-
+@ApiTags('Curriculum')
+@ApiBearerAuth()
 @UseGuards(JwtAuthGuard)
 @Controller('curriculum')
 export class CurriculumController {

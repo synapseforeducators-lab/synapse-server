@@ -39,18 +39,22 @@ export class CreateCurriculumItemDto {
 }
 
 export class CreateCurriculumDto {
+  @ApiProperty()
   @IsString()
   @IsNotEmpty()
   name: string;
 
+  @ApiProperty()
   @IsString()
   @IsNotEmpty()
   subject: string;
 
+  @ApiProperty()
   @IsString()
   @IsNotEmpty()
   grade: string;
 
+  @ApiProperty({ type: () => CreateCurriculumItemDto, isArray: true })
   @IsArray()
   @ValidateNested({ each: true })
   @Type(() => CreateCurriculumItemDto)
