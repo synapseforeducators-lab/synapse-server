@@ -36,11 +36,14 @@ export class School extends AbstractEntity<School> {
   @Column({ nullable: true })
   country: string;
 
-  @ManyToOne(() => User)
-  @JoinColumn()
+  @ManyToOne(() => User, (user) => user.createdSchools, {
+    onDelete: 'SET NULL',
+    nullable: true,
+  })
   createdBy: User;
 
-  @OneToMany(() => User, (user) => user.school)
+  @OneToMany(() => User, (user) => user.school,)
+  @JoinColumn()
   users: User[];
 
   @BeforeInsert()

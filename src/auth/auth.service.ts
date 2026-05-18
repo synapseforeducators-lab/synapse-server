@@ -61,10 +61,6 @@ export class AuthService {
     if (!user) throw new InternalServerErrorException('Something went wrong');
 
     console.log({ code });
-    // this.smsService
-    //   .phoneNumberVerification(user.phone_number, code)
-    //   .then()
-    //   .catch((error) => console.log({ error }));
 
     return customResponse(
       'Reset Pasword, code sent successfully',

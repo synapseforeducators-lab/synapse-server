@@ -1,15 +1,46 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  UseInterceptors,
+  UploadedFile,
+  UseGuards,
+} from '@nestjs/common';
 import { SupportService } from './support.service';
 import { CreateSupportDto } from './dto/create-support.dto';
 import { UpdateSupportDto } from './dto/update-support.dto';
+import { ApiBearerAuth, ApiBody, ApiConsumes, ApiTags } from '@nestjs/swagger';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { memoryStorage } from 'multer';
+import { CurrentUser } from 'src/common/decorators';
+import { User } from 'src/user/entities/user.entity';
+import { JwtAuthGuard } from 'src/auth/guards/jwt-auth/jwt-auth.guard';
 
+@ApiTags('Support')
+@ApiBearerAuth()
+@UseGuards(JwtAuthGuard)
 @Controller('support')
 export class SupportController {
   constructor(private readonly supportService: SupportService) {}
 
   @Post()
-  create(@Body() createSupportDto: CreateSupportDto) {
-    return this.supportService.create(createSupportDto);
+  @ApiConsumes('multipart/form-data')
+  @ApiBody({
+    type: CreateSupportDto,
+  })
+  @UseInterceptors(FileInterceptor('file', { storage: memoryStorage() }))
+  create(
+    @CurrentUser() user: User,
+    @UploadedFile()
+    file: Express.Multer.File,
+
+    @Body() createSupportDto: CreateSupportDto,
+  ) {
+    return this.supportService.create(user, createSupportDto, file);
   }
 
   @Get()
@@ -19,16 +50,6 @@ export class SupportController {
 
   @Get(':id')
   findOne(@Param('id') id: string) {
-    return this.supportService.findOne(+id);
-  }
-
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateSupportDto: UpdateSupportDto) {
-    return this.supportService.update(+id, updateSupportDto);
-  }
-
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.supportService.remove(+id);
+    return this.supportService.findOne(id);
   }
 }

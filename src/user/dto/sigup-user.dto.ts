@@ -2,19 +2,13 @@ import { ApiProperty } from '@nestjs/swagger';
 import {
   IsAlpha,
   IsEmail,
-  IsEnum,
   IsNotEmpty,
   IsNumberString,
-  IsPhoneNumber,
   IsStrongPassword,
   Length,
-  ValidateIf,
 } from 'class-validator';
 
-export enum SignupChannelType {
-  EMAIL = 'EMAIL',
-  PHONE = 'PHONE',
-}
+
 
 export class SignupUserDto {
   @ApiProperty()

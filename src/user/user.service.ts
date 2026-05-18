@@ -8,7 +8,6 @@ import {
 import {
   NewPasswordDto,
   ResetPasswordDto,
-  SignupChannelType,
   SignupUserDto,
   UpdateProfileDto,
   VerifySignupDto,
@@ -62,11 +61,13 @@ export class UsersService {
 
       const { user, code } =
         await this.usersRepository.signupExist(signupUserDto);
+      console.log(code);
 
       return { user, code };
     }
 
     const { user, code } = await this.usersRepository.signup(signupUserDto);
+    console.log(code);
 
     return { user, code };
   }
