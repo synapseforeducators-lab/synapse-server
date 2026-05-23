@@ -24,11 +24,13 @@ import { TokenPayload } from 'src/common/interfaces';
 import refreshJwtConfig from './config/refresh-jwt.config';
 import { SignupLoginEnum } from 'src/user/enums/user.enum';
 import { EmailService } from 'src/common/email/email.service';
+import { SchoolsService } from 'src/schools/school.service';
 
 @Injectable()
 export class AuthService {
   constructor(
     private readonly usersService: UsersService,
+    private readonly schoolService: SchoolsService,
     private readonly configService: ConfigService,
     private readonly jwtService: JwtService,
     private readonly emailService: EmailService,
@@ -172,6 +174,8 @@ export class AuthService {
       this.refreshTokenConfig,
     );
 
+    const school = await this.schoolService.findSchoolByUser(user);
+
     delete user.password;
     delete user.created_at;
     delete user.updated_at;
@@ -184,6 +188,7 @@ export class AuthService {
         refresh_token,
       },
       user,
+      school,
     });
   }
   async refreshToken(user: User) {

@@ -10,8 +10,8 @@ import {
   Min,
   ValidateNested,
 } from 'class-validator';
-import { SectionType } from '../entities/section.entity';
-import { ApiBody, ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import { SectionTypeEnum } from '../entities/section.entity';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 
 export class CreateTemplateSectionDto {
   @ApiProperty()
@@ -20,8 +20,8 @@ export class CreateTemplateSectionDto {
   label: string;
 
   @ApiProperty()
-  @IsEnum(SectionType)
-  type: SectionType;
+  @IsEnum(SectionTypeEnum)
+  type: SectionTypeEnum;
 
   @ApiPropertyOptional()
   @IsBoolean()

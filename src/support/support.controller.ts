@@ -1,3 +1,4 @@
+import { Roles } from '../auth/decorators/role.decorators';
 import {
   Controller,
   Get,
@@ -19,6 +20,8 @@ import { memoryStorage } from 'multer';
 import { CurrentUser } from 'src/common/decorators';
 import { User } from 'src/user/entities/user.entity';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth/jwt-auth.guard';
+import { RolesGuard } from 'src/auth/guards/roles/roles.guard';
+import { Role } from 'src/user/enums/role.enum';
 
 @ApiTags('Support')
 @ApiBearerAuth()
@@ -44,6 +47,8 @@ export class SupportController {
   }
 
   @Get()
+  @Roles(Role.ADMIN)
+  @UseGuards(RolesGuard)
   findAll() {
     return this.supportService.findAll();
   }

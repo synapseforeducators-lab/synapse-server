@@ -23,6 +23,7 @@ export class SupportService {
 
     const support = new Support({
       attachment_url: imgUrl,
+      userId: user.id,
       user: user,
       ...createSupportDto,
     });

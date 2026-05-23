@@ -1,36 +1,46 @@
-import { SmsService } from '../common/sms/sms.service';
 import { BadRequestException, Injectable } from '@nestjs/common';
 
-import { User } from './entities/user.entity';
 import { customResponse } from 'src/common/util';
 
-import { CreateSchoolDto, UpdateSchoolDto } from './dto/create-school.dto';
+import { CreateSchoolDto } from './dto/create-school.dto';
 import { SchoolsRepository } from './repository/schools.repository';
 import { CloudinaryService } from 'src/common/cloudinary/cloudinary.service';
-import { UsersRepository } from './repository/users.repository';
+import { User } from 'src/user/entities/user.entity';
+import { SchoolMembersRepository } from './repository/school-members.repository';
+import { UpdateSchoolDto } from './dto/update-school.dto';
 
 @Injectable()
 export class SchoolsService {
   constructor(
+    private readonly userRepository: SchoolsRepository,
     private readonly schoolsRepository: SchoolsRepository,
+    private readonly schoolMembersRepository: SchoolMembersRepository,
     private readonly cloudinaryService: CloudinaryService,
   ) {}
 
   async createSchoolProfile(user: User, createSchoolDto: CreateSchoolDto) {
-    const schoolRes = await this.schoolsRepository.createSchoolProfile(
+    const existingSchool = await this.schoolsRepository.findOne({
+      ownerId: user.id,
+    });
+
+    if (existingSchool) {
+      throw new BadRequestException('User already attached to a school');
+    }
+
+    const { school } = await this.userRepository.createSchool(
       user,
       createSchoolDto,
     );
 
-    if (!schoolRes) {
-      throw new BadRequestException('Something went wrong');
-    }
+    delete school.created_at;
+    delete school.updated_at;
+    delete school.id;
 
-    return customResponse('School profile added successfully');
+    return customResponse('School profile added successfully', school);
   }
 
   async updateSchoolLogo(user: User, file: Express.Multer.File) {
-    const userResp = await this.schoolsRepository.findOne({ createdBy: user });
+    const userResp = await this.schoolsRepository.findOne({ owner: user });
 
     if (!userResp) {
       throw new BadRequestException('Reach out to admin to update school logo');
@@ -40,7 +50,7 @@ export class SchoolsService {
     if (!imgUrl) throw new BadRequestException('unable to upload image');
 
     const schoolResp = await this.schoolsRepository.findOneAndUpdate(
-      { createdBy: user },
+      { owner: user },
       {
         school_logo_url: imgUrl,
       },
@@ -53,7 +63,7 @@ export class SchoolsService {
   }
 
   async updateSchoolProfile(user: User, updateSchoolDto: UpdateSchoolDto) {
-    const userResp = await this.schoolsRepository.findOne({ createdBy: user });
+    const userResp = await this.schoolsRepository.findOne({ owner: user });
 
     if (!userResp) {
       throw new BadRequestException(
@@ -62,7 +72,7 @@ export class SchoolsService {
     }
 
     const schoolRes = await this.schoolsRepository.findOneAndUpdate(
-      { createdBy: user },
+      { owner: user },
       { ...updateSchoolDto },
     );
 
@@ -71,5 +81,25 @@ export class SchoolsService {
     }
 
     return customResponse('School profile details updated successfully');
+  }
+
+  async findSchoolByUser(user: User) {
+    const schoolMember = await this.schoolMembersRepository.findOne({
+      userId: user.id,
+    });
+    if (!schoolMember) {
+      return null;
+    }
+
+    const school = await this.schoolsRepository.findOne({
+      id: schoolMember.schoolId,
+    });
+
+    delete school.id;
+    delete school.updated_at;
+    delete school.created_at;
+    delete school.owner;
+    delete school.ownerId;
+    return school;
   }
 }

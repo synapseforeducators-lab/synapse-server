@@ -2,7 +2,7 @@ import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
 import { Curriculum } from './curriculum.entity';
 import { AbstractEntity } from 'src/common';
 
-@Entity()
+@Entity('curriculum_items')
 export class CurriculumItem extends AbstractEntity<CurriculumItem> {
   @Column({ nullable: true })
   theme?: string;
@@ -23,4 +23,7 @@ export class CurriculumItem extends AbstractEntity<CurriculumItem> {
     onDelete: 'CASCADE',
   })
   curriculum: Curriculum;
+
+  @Column()
+  curriculumId: string;
 }

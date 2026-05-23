@@ -31,11 +31,11 @@ export class TemplateController {
    * automatically if they belong to one.
    */
   @Post()
-  create(
+  async create(
     @CurrentUser() user: User,
     @Body() createTemplateDto: CreateTemplateDto,
   ) {
-    return this.templateService.create(user, createTemplateDto);
+    return  await this.templateService.createTemplate(user, createTemplateDto);
   }
 
   /**
@@ -46,7 +46,7 @@ export class TemplateController {
    */
   @Get()
   findAll(@CurrentUser() user: User) {
-    return this.templateService.findAll(user);
+    return this.templateService.getAllTemplate(user);
   }
 
   /**
@@ -55,7 +55,7 @@ export class TemplateController {
    */
   @Get(':id')
   findOne(@Param('id') id: string, @CurrentUser() user: User) {
-    return this.templateService.findOne(id, user);
+    // return this.templateService.findOne(id, user);
   }
 
   /**

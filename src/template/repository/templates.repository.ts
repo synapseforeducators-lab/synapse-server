@@ -13,6 +13,8 @@ import { CreateTemplateDto } from '../dto/create-template.dto';
 import { UpdateTemplateDto } from '../dto/update-template.dto';
 import { TemplateSection } from '../entities/section.entity';
 import { User } from 'src/user/entities/user.entity';
+import { SchoolMember } from 'src/schools/entities/school-member.entity';
+import { School } from 'src/schools/entities/school.entity';
 
 @Injectable()
 export class TemplatesRepository extends AbstractRepository<Template> {
@@ -38,6 +40,8 @@ export class TemplatesRepository extends AbstractRepository<Template> {
     try {
       const { sections, ...templateData } = createTemplateDto;
 
+      let schoolExist: School;
+      let template: Template;
       const templateSections = sections.map((sectionDto, index) =>
         this.entityManager.create(TemplateSection, {
           ...sectionDto,
@@ -45,14 +49,50 @@ export class TemplatesRepository extends AbstractRepository<Template> {
         }),
       );
 
-      const template = this.repository.create({
-        ...templateData,
-        school: user.school ?? null,
-        createdBy: user,
-        sections: templateSections,
-      });
+      console.log(templateSections);
 
-      return await this.repository.save(template);
+      await this.entityManager.transaction(
+        async (transactionalEntityManager: EntityManager) => {
+          const schoolMemberExist = await transactionalEntityManager.findOne(
+            SchoolMember,
+            {
+              where: { userId: user.id },
+            },
+          );
+
+          if (!schoolMemberExist) {
+            schoolExist = null;
+          }
+
+          if (schoolMemberExist) {
+            schoolExist = await transactionalEntityManager.findOne(School, {
+              where: { id: schoolMemberExist.schoolId },
+            });
+          }
+
+          template = this.repository.create({
+            school: schoolExist ?? null,
+            schoolId: schoolExist.id ?? null,
+            createdBy: user,
+            sections: templateSections,
+            ...templateData,
+          });
+
+          template = await this.repository.save(template);
+        },
+      );
+
+      console.log(template);
+
+      delete template.createdBy;
+      delete template.createdById;
+      delete template.created_at;
+      delete template.updated_at;
+      delete template.school;
+      delete template.schoolId;
+      delete template.id;
+
+      return template;
     } catch (error) {
       this.logger.error('Error creating template', error);
       throw new BadRequestException('Error creating template');
@@ -68,63 +108,63 @@ export class TemplatesRepository extends AbstractRepository<Template> {
    *    have no school association (personal drafts).
    *  - If the user has no school        → return only their own templates.
    */
-  async findAllForUser(user: User): Promise<Template[]> {
-    try {
-      if (user.school) {
-        return await this.repository.find({
-          where: [
-            { school: { id: user.school.id } },
-            { createdBy: { id: user.id }, school: IsNull() },
-          ],
-          relations: ['createdBy', 'school'],
-          order: { created_at: 'DESC' },
-        });
-      }
+  // async findAllForUser(user: User): Promise<Template[]> {
+  //   try {
+  //     if (user.school) {
+  //       return await this.repository.find({
+  //         where: [
+  //           { school: { id: user.school.id } },
+  //           { createdBy: { id: user.id }, school: IsNull() },
+  //         ],
+  //         relations: ['createdBy', 'school'],
+  //         order: { created_at: 'DESC' },
+  //       });
+  //     }
 
-      return await this.repository.find({
-        where: { createdBy: { id: user.id } },
-        relations: ['createdBy', 'school'],
-        order: { created_at: 'DESC' },
-      });
-    } catch (error) {
-      this.logger.error('Error fetching templates', error);
-      throw new BadRequestException('Error fetching templates');
-    }
-  }
+  //     return await this.repository.find({
+  //       where: { createdBy: { id: user.id } },
+  //       relations: ['createdBy', 'school'],
+  //       order: { created_at: 'DESC' },
+  //     });
+  //   } catch (error) {
+  //     this.logger.error('Error fetching templates', error);
+  //     throw new BadRequestException('Error fetching templates');
+  //   }
+  // }
 
   /**
    * Find a single template by id, provided it is visible to the user.
    */
-  async findOneForUser(id: string, user: User): Promise<Template> {
-    try {
-      let template: Template | null = null;
+  // async findOneForUser(id: string, user: User): Promise<Template> {
+  //   try {
+  //     let template: Template | null = null;
 
-      if (user.school) {
-        template = await this.repository.findOne({
-          where: [
-            { id, school: { id: user.school.id } },
-            { id, createdBy: { id: user.id }, school: IsNull() },
-          ],
-          relations: ['createdBy', 'school'],
-        });
-      } else {
-        template = await this.repository.findOne({
-          where: { id, createdBy: { id: user.id } },
-          relations: ['createdBy', 'school'],
-        });
-      }
+  //     if (user.school) {
+  //       template = await this.repository.findOne({
+  //         where: [
+  //           { id, school: { id: user.school.id } },
+  //           { id, createdBy: { id: user.id }, school: IsNull() },
+  //         ],
+  //         relations: ['createdBy', 'school'],
+  //       });
+  //     } else {
+  //       template = await this.repository.findOne({
+  //         where: { id, createdBy: { id: user.id } },
+  //         relations: ['createdBy', 'school'],
+  //       });
+  //     }
 
-      if (!template) {
-        throw new NotFoundException(`Template ${id} not found`);
-      }
+  //     if (!template) {
+  //       throw new NotFoundException(`Template ${id} not found`);
+  //     }
 
-      return template;
-    } catch (error) {
-      if (error instanceof NotFoundException) throw error;
-      this.logger.error('Error fetching template', error);
-      throw new BadRequestException('Error fetching template');
-    }
-  }
+  //     return template;
+  //   } catch (error) {
+  //     if (error instanceof NotFoundException) throw error;
+  //     this.logger.error('Error fetching template', error);
+  //     throw new BadRequestException('Error fetching template');
+  //   }
+  // }
 
   /**
    * Update a template.  Only the original creator may update it.

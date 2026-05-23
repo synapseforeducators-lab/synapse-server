@@ -10,6 +10,7 @@ import { JwtStrategy } from './strategies/jwt.strategy';
 import refreshJwtConfig from './config/refresh-jwt.config';
 import { RefreshJwtStrategy } from './strategies/refresh.strategy';
 import { EmailModule } from 'src/common/email/email.module';
+import { SchoolModule } from 'src/schools/school.module';
 
 @Module({
   imports: [
@@ -18,6 +19,7 @@ import { EmailModule } from 'src/common/email/email.module';
     JwtModule.registerAsync(jwtConfig.asProvider()),
     ConfigModule.forFeature(jwtConfig),
     ConfigModule.forFeature(refreshJwtConfig),
+    SchoolModule,
   ],
   controllers: [AuthController],
   providers: [AuthService, LocalStrategy, JwtStrategy, RefreshJwtStrategy],

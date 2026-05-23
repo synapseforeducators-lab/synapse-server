@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 
 import { CreateTemplateDto } from './dto/create-template.dto';
 import { UpdateTemplateDto } from './dto/update-template.dto';
@@ -10,17 +10,40 @@ import { User } from 'src/user/entities/user.entity';
 export class TemplateService {
   constructor(private readonly templatesRepository: TemplatesRepository) {}
 
-  async create(user: User, createTemplateDto: CreateTemplateDto): Promise<Template> {
-    return this.templatesRepository.createTemplate(user, createTemplateDto);
+  async createTemplate(
+    user: User,
+    createTemplateDto: CreateTemplateDto,
+  ): Promise<Template> {
+    return await this.templatesRepository.createTemplate(
+      user,
+      createTemplateDto,
+    );
   }
 
-  async findAll(user: User): Promise<Template[]> {
-    return this.templatesRepository.findAllForUser(user);
+  async getAllTemplate(user: User) {
+    const templateRes = await this.templatesRepository
+      .qb('templates')
+      .where('templates.createdById = :createdById', { createdById: user.id })
+      .leftJoinAndSelect('templates.sections', 'sections')
+      .select([
+        'templates.name',
+        'sections.label',
+        'sections.type',
+        'sections.required',
+        'sections.order',
+      ])
+      .getMany();
+
+    if (!templateRes) {
+      throw new BadRequestException('unable to get template');
+    }
+
+    return templateRes;
   }
 
-  async findOne(id: string, user: User): Promise<Template> {
-    return this.templatesRepository.findOneForUser(id, user);
-  }
+  // async findOne(id: string, user: User): Promise<Template> {
+  //   return this.templatesRepository.findOneForUser(id, user);
+  // }
 
   async update(
     id: string,

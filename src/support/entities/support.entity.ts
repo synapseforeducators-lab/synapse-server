@@ -27,9 +27,10 @@ export class Support extends AbstractEntity<Support> {
   @Column({ type: 'text', nullable: true })
   attachment_url?: string;
 
-  @ManyToOne(() => User, (user) => user.supports, {
-    onDelete: 'CASCADE',
-  })
-  @JoinColumn()
+  @Column()
+  userId: string;
+
+  @ManyToOne(() => User)
+  @JoinColumn({ name: 'userId' })
   user: User;
 }

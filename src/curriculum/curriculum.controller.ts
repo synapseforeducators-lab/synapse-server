@@ -46,17 +46,17 @@ export class CurriculumController {
    */
   @Get()
   findAll(@CurrentUser() user: User) {
-    return this.curriculumService.findAll(user);
+    return this.curriculumService.getAllCurriculum(user);
   }
 
   /**
    * GET /curriculum/:id
    * Retrieve a single curriculum if accessible to the current user.
    */
-  @Get(':id')
-  findOne(@Param('id') id: string, @CurrentUser() user: User) {
-    return this.curriculumService.findOne(id, user);
-  }
+  // @Get(':id')
+  // findOne(@Param('id') id: string, @CurrentUser() user: User) {
+  //   return this.curriculumService.findOne(id, user);
+  // }
 
   /**
    * PATCH /curriculum/:id

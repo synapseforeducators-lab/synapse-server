@@ -8,9 +8,27 @@ import {
   OneToMany,
 } from 'typeorm';
 import { AbstractEntity } from '../../common';
-import { User } from './user.entity';
+import { User } from 'src/user/entities/user.entity';
 
-@Entity()
+export enum SchoolRole {
+  OWNER = 'OWNER',
+  ADMIN = 'ADMIN',
+  TEACHER = 'TEACHER',
+  STAFF = 'STAFF',
+}
+
+export enum SchoolTypeEnum {
+  PRIVATE = 'PRIVATE',
+  PUBLIC = 'PUBLIC',
+}
+
+export enum SchoolGradeEnum {
+  PRIMARY = 'PRIMARY',
+  SECONDARY = 'SECONDARY',
+  BOTH = 'BOTH',
+}
+
+@Entity('schools')
 export class School extends AbstractEntity<School> {
   @Column({ type: 'text', nullable: true })
   school_logo_url?: string;
@@ -18,11 +36,11 @@ export class School extends AbstractEntity<School> {
   @Column({ unique: true })
   school_name: string;
 
-  @Column({ nullable: true })
-  type: string;
+  @Column({ nullable: true, enum: SchoolTypeEnum, type: 'enum' })
+  type: SchoolTypeEnum;
 
-  @Column({ nullable: true })
-  grade: string;
+  @Column({ nullable: true, enum: SchoolGradeEnum, type: 'enum' })
+  grade: SchoolGradeEnum;
 
   @Column({ nullable: true })
   postal_address: string;
@@ -36,15 +54,12 @@ export class School extends AbstractEntity<School> {
   @Column({ nullable: true })
   country: string;
 
-  @ManyToOne(() => User, (user) => user.createdSchools, {
-    onDelete: 'SET NULL',
-    nullable: true,
-  })
-  createdBy: User;
+  @Column()
+  ownerId: string;
 
-  @OneToMany(() => User, (user) => user.school,)
-  @JoinColumn()
-  users: User[];
+  @ManyToOne(() => User)
+  @JoinColumn({ name: 'ownerId' })
+  owner: User;
 
   @BeforeInsert()
   async updateRecord() {

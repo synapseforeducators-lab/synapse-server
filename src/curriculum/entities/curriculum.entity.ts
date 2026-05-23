@@ -1,5 +1,4 @@
 import { AbstractEntity } from 'src/common';
-import { School } from 'src/user/entities/school.entity';
 import { User } from 'src/user/entities/user.entity';
 import {
   Column,
@@ -11,8 +10,9 @@ import {
   UpdateDateColumn,
 } from 'typeorm';
 import { CurriculumItem } from './curriculum-entity.entity';
+import { School } from 'src/schools/entities/school.entity';
 
-@Entity()
+@Entity('curriculums')
 export class Curriculum extends AbstractEntity<Curriculum> {
   @Column()
   name: string;
@@ -23,15 +23,26 @@ export class Curriculum extends AbstractEntity<Curriculum> {
   @Column()
   grade: string;
 
-  @ManyToOne(() => School, { nullable: true, eager: false })
+  @ManyToOne(() => School, {
+    nullable: true,
+    onDelete: 'CASCADE',
+  })
   school: School | null;
 
-  @ManyToOne(() => User, { eager: false })
+  @Column({ nullable: true })
+  schoolId?: string | null;
+
+  @ManyToOne(() => User, {
+    nullable: false,
+    onDelete: 'CASCADE',
+  })
   createdBy: User;
+
+  @Column()
+  createdById: string;
 
   @OneToMany(() => CurriculumItem, (item) => item.curriculum, {
     cascade: true,
-    eager: true,
   })
   items: CurriculumItem[];
 }

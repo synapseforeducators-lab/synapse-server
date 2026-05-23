@@ -19,8 +19,6 @@ import {
   UpdatePasswordDto,
   UpdateUserProfileDto,
 } from './dto/update-user-details.dto';
-import { SchoolsService } from './school.service';
-import { CreateSchoolDto, UpdateSchoolDto } from './dto/create-school.dto';
 
 @ApiTags('User')
 @ApiBearerAuth()
@@ -29,7 +27,6 @@ import { CreateSchoolDto, UpdateSchoolDto } from './dto/create-school.dto';
 export class UsersController {
   constructor(
     private readonly userService: UsersService,
-    private readonly schoolsService: SchoolsService,
   ) {}
 
   // @Post('/verify-nin')
@@ -51,21 +48,7 @@ export class UsersController {
     );
   }
   
-  @Post('update-school-profile')
-  async CreateSchoolProfile(
-    @CurrentUser() user: User,
-    @Body() createSchoolDto: CreateSchoolDto,
-  ) {
-    return await this.schoolsService.createSchoolProfile(user, createSchoolDto);
-  }
 
-  @Post('update-school-profile')
-  async UpdateSchoolProfile(
-    @CurrentUser() user: User,
-    @Body() updateSchoolDto: UpdateSchoolDto,
-  ) {
-    return await this.schoolsService.updateSchoolProfile(user, updateSchoolDto);
-  }
 
   @Post('update-password')
   async UpdatePassword(
@@ -94,22 +77,5 @@ export class UsersController {
     return await this.userService.updateProfilePicture(user, file);
   }
 
-  @Post('update-school-logo')
-  @ApiConsumes('multipart/form-data')
-  @ApiBody({
-    schema: {
-      type: 'object',
-      properties: {
-        file: { type: 'string', format: 'binary' },
-      },
-    },
-  })
-  @UseInterceptors(FileInterceptor('file', { storage: memoryStorage() }))
-  async updateSchoolLogo(
-    @CurrentUser() user: User,
-    @UploadedFile(new FileSizeValidationPipe())
-    file: Express.Multer.File,
-  ) {
-    return await this.schoolsService.updateSchoolLogo(user, file);
-  }
+
 }

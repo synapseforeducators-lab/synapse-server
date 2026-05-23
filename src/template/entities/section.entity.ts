@@ -2,7 +2,7 @@ import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
 import { Template } from './template.entity';
 import { AbstractEntity } from 'src/common';
 
-export enum SectionType {
+export enum SectionTypeEnum {
   TEXT = 'text',
   RICH_TEXT = 'rich_text',
   LIST = 'list',
@@ -16,10 +16,10 @@ export class TemplateSection extends AbstractEntity<TemplateSection> {
 
   @Column({
     type: 'enum',
-    enum: SectionType,
-    default: SectionType.TEXT,
+    enum: SectionTypeEnum,
+    default: SectionTypeEnum.TEXT,
   })
-  type: SectionType;
+  type: SectionTypeEnum;
 
   @Column({ default: false })
   required: boolean;

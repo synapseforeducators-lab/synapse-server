@@ -12,6 +12,12 @@ import { EmailModule } from './common/email/email.module';
 import { TemplateModule } from './template/template.module';
 import { SupportModule } from './support/support.module';
 import { CurriculumModule } from './curriculum/curriculum.module';
+import { SubjectModule } from './subject/subject.module';
+import { SchoolModule } from './schools/school.module';
+import { TeamsModule } from './teams/teams.module';
+import { BillingModule } from './billing/billing.module';
+import { SchemesModule } from './schemes/schemes.module';
+import { NotesModule } from './notes/notes.module';
 
 @Module({
   imports: [
@@ -40,6 +46,12 @@ import { CurriculumModule } from './curriculum/curriculum.module';
     TemplateModule,
     SupportModule,
     CurriculumModule,
+    SubjectModule,
+    SchoolModule,
+    TeamsModule,
+    BillingModule,
+    SchemesModule,
+    NotesModule,
   ],
   controllers: [AppController],
   providers: [AppService],

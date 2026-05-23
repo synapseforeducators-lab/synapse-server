@@ -1,19 +1,7 @@
-import {
-  BeforeInsert,
-  Column,
-  Entity,
-  Generated,
-  Index,
-  JoinColumn,
-  ManyToOne,
-  OneToMany,
-  OneToOne,
-} from 'typeorm';
+import { BeforeInsert, Column, Entity, Index } from 'typeorm';
 import { AbstractEntity } from '../../common';
 import { Role } from '../enums/role.enum';
 import { VerificationCodeUserCase } from '../enums/user.enum';
-import { School } from './school.entity';
-import { Support } from 'src/support/entities/support.entity';
 
 @Entity()
 export class User extends AbstractEntity<User> {
@@ -57,20 +45,6 @@ export class User extends AbstractEntity<User> {
   @Column({ type: 'boolean', nullable: false, default: false })
   email_verified: boolean;
 
-  @ManyToOne(() => School, (school) => school.users, {
-    onDelete: 'SET NULL',
-    nullable: true,
-  })
-  @JoinColumn()
-  school: School;
-
-  @OneToMany(() => School, (school) => school.createdBy)
-  createdSchools: School[];
-
-  @OneToMany(() => Support, (support) => support.user)
-  supports: Support[];
-
-  
   @BeforeInsert()
   async updateName() {
     this.first_name = this.first_name.toLowerCase().trim();
