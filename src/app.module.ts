@@ -18,6 +18,7 @@ import { TeamsModule } from './teams/teams.module';
 import { BillingModule } from './billing/billing.module';
 import { SchemesModule } from './schemes/schemes.module';
 import { NotesModule } from './notes/notes.module';
+import { UsageModule } from './usage/usage.module';
 
 @Module({
   imports: [
@@ -52,6 +53,7 @@ import { NotesModule } from './notes/notes.module';
     BillingModule,
     SchemesModule,
     NotesModule,
+    UsageModule,
   ],
   controllers: [AppController],
   providers: [AppService],
