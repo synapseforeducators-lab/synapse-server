@@ -5,7 +5,7 @@ import { UpdateSubjectDto } from './dto/update-subject.dto';
 @Injectable()
 export class SubjectService {
   create(createSubjectDto: CreateSubjectDto) {
-    return 'This action adds a new subject';
+    return createSubjectDto;
   }
 
   findAll() {
@@ -17,7 +17,7 @@ export class SubjectService {
   }
 
   update(id: number, updateSubjectDto: UpdateSubjectDto) {
-    return `This action updates a #${id} subject`;
+    return { updateSubjectDto, id };
   }
 
   remove(id: number) {

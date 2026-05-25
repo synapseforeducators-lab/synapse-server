@@ -11,7 +11,6 @@ import { ApiBearerAuth, ApiBody, ApiConsumes, ApiTags } from '@nestjs/swagger';
 import { UsersService } from './user.service';
 import { CurrentUser } from 'src/common/decorators';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth/jwt-auth.guard';
-import { UpdateNinDto } from './dto/verify-nin.dto';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { FileSizeValidationPipe } from './pipes/profile-image.pipe';
 import { memoryStorage } from 'multer';

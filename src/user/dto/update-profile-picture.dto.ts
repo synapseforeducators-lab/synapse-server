@@ -1,4 +1,4 @@
-import { IsNotEmpty, IsString, IsUrl, MinLength } from 'class-validator';
+import { IsNotEmpty, IsUrl, MinLength } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 
 export class UpdateProfilePictureDto {

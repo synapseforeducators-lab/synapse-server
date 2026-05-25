@@ -1,6 +1,6 @@
 import { InjectRepository } from '@nestjs/typeorm';
 import { AbstractRepository } from '../../common';
-import { EntityManager, IsNull, Repository } from 'typeorm';
+import { EntityManager, Repository } from 'typeorm';
 import {
   BadRequestException,
   Injectable,

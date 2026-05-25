@@ -5,7 +5,7 @@ import { UpdateNoteDto } from './dto/update-note.dto';
 @Injectable()
 export class NotesService {
   create(createNoteDto: CreateNoteDto) {
-    return 'This action adds a new note';
+    return createNoteDto;
   }
 
   findAll() {
@@ -17,7 +17,7 @@ export class NotesService {
   }
 
   update(id: number, updateNoteDto: UpdateNoteDto) {
-    return `This action updates a #${id} note`;
+    return {updateNoteDto, id};
   }
 
   remove(id: number) {

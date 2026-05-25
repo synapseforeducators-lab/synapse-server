@@ -1,11 +1,9 @@
 import { School } from 'src/schools/entities/school.entity';
 import {
   Entity,
-  PrimaryGeneratedColumn,
   Column,
   ManyToOne,
-  CreateDateColumn,
-  UpdateDateColumn,
+
 } from 'typeorm';
 import { BillingPlan } from '../enum/billing-plan.enum';
 import { SubscriptionStatus } from '../enum/subscription-status.enum';

@@ -1,8 +1,6 @@
 import {
   Entity,
-  PrimaryGeneratedColumn,
   Column,
-  CreateDateColumn,
 } from 'typeorm';
 import { BillingStatus } from '../enum/billing-status.enum';
 import { AbstractEntity } from 'src/common';

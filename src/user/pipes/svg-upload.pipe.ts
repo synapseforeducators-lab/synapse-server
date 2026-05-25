@@ -7,7 +7,7 @@ import {
 
 @Injectable()
 export class SvgFileValidationPipe implements PipeTransform {
-  transform(value: Express.Multer.File, metadata: ArgumentMetadata) {
+  transform(value: Express.Multer.File, _metadata: ArgumentMetadata) {
     if (!value) {
       throw new BadRequestException('No file provided.');
     }

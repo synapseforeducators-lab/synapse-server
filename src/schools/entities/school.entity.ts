@@ -2,10 +2,8 @@ import {
   BeforeInsert,
   Column,
   Entity,
-  Index,
   JoinColumn,
   ManyToOne,
-  OneToMany,
 } from 'typeorm';
 import { AbstractEntity } from '../../common';
 import { User } from 'src/user/entities/user.entity';

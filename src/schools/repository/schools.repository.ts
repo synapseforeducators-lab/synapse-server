@@ -2,7 +2,6 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { AbstractRepository } from '../../common';
 import { EntityManager, Repository } from 'typeorm';
 import {
-  BadRequestException,
   Injectable,
   Logger,
   NotFoundException,

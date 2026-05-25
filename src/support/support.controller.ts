@@ -4,16 +4,13 @@ import {
   Get,
   Post,
   Body,
-  Patch,
   Param,
-  Delete,
   UseInterceptors,
   UploadedFile,
   UseGuards,
 } from '@nestjs/common';
 import { SupportService } from './support.service';
 import { CreateSupportDto } from './dto/create-support.dto';
-import { UpdateSupportDto } from './dto/update-support.dto';
 import { ApiBearerAuth, ApiBody, ApiConsumes, ApiTags } from '@nestjs/swagger';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { memoryStorage } from 'multer';

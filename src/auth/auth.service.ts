@@ -4,7 +4,7 @@ import {
   Injectable,
   InternalServerErrorException,
 } from '@nestjs/common';
-import { UserLoginDto, PasswordResetDto, PhoneVerificationDto } from './dto';
+import { UserLoginDto } from './dto';
 import { ConfigService, ConfigType } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import { UsersService } from 'src/user/user.service';
@@ -17,7 +17,6 @@ import {
 import { customResponse } from 'src/common/util';
 import {
   GetUserByEmailDto,
-  GetUserByPhoneDto,
 } from 'src/user/dto/get-user.dto';
 import { User } from 'src/user/entities/user.entity';
 import { TokenPayload } from 'src/common/interfaces';

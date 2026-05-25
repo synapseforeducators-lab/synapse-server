@@ -1,6 +1,5 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { CreateSupportDto } from './dto/create-support.dto';
-import { UpdateSupportDto } from './dto/update-support.dto';
 import { CloudinaryService } from 'src/common/cloudinary/cloudinary.service';
 import { SupportsRepository } from './repository/supports.repository';
 import { User } from 'src/user/entities/user.entity';

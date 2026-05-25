@@ -1,9 +1,7 @@
 import {
   Entity,
-  PrimaryGeneratedColumn,
   Column,
-  UpdateDateColumn,
-  CreateDateColumn,
+
   Index,
 } from 'typeorm';
 import { UsageType } from '../enums/usage-type.enum';

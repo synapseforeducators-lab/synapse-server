@@ -1,4 +1,3 @@
-import { SmsService } from './../common/sms/sms.service';
 import {
   BadRequestException,
   ForbiddenException,
@@ -9,25 +8,20 @@ import {
   NewPasswordDto,
   ResetPasswordDto,
   SignupUserDto,
-  UpdateProfileDto,
   VerifySignupDto,
 } from './dto';
 import { UsersRepository } from './repository/users.repository';
 import * as bcrypt from 'bcryptjs';
-import { GetUserByEmailDto, GetUserByPhoneDto } from './dto/get-user.dto';
+import { GetUserByEmailDto } from './dto/get-user.dto';
 import { User } from './entities/user.entity';
 import {
   customResponse,
-  encryptPayload,
   otpGenerator,
-  phoneNumberFormatter,
 } from 'src/common/util';
 import { TokenPayload } from 'src/common/interfaces';
-import { PasswordUpdateDto } from './dto/password-update.dto';
-import { PhoneVerificationDto, UserLoginDto } from 'src/auth/dto';
+import {  UserLoginDto } from 'src/auth/dto';
 import { ConfigService } from '@nestjs/config';
-import { SignupLoginEnum, VerificationCodeUserCase } from './enums/user.enum';
-import { UpdateNameDto } from './dto/update-name.dto';
+import {  VerificationCodeUserCase } from './enums/user.enum';
 import { UpdateEmailDto } from './dto/update-email.dto';
 import {
   UpdatePasswordDto,
