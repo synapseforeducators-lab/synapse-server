@@ -53,10 +53,10 @@ export class TemplateController {
    * GET /templates/:id
    * Retrieve a single template if it is accessible to the current user.
    */
-  @Get(':id')
-  findOne(@Param('id') id: string, @CurrentUser() user: User) {
-    // return this.templateService.findOne(id, user);
-  }
+  // @Get(':id')
+  // findOne(@Param('id') id: string, @CurrentUser() user: User) {
+  //   return this.templateService.findOne(id, user);
+  // }
 
   /**
    * PATCH /templates/:id

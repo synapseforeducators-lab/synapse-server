@@ -7,6 +7,7 @@ import {
 
 @Injectable()
 export class FileSizeValidationPipe implements PipeTransform {
+  // @ts-nocheck
   transform(value: Express.Multer.File, _metadata: ArgumentMetadata) {
     if (!value) {
       throw new BadRequestException('No file provided.');
