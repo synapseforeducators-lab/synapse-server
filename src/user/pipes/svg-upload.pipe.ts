@@ -1,14 +1,8 @@
-import {
-  PipeTransform,
-  Injectable,
-  ArgumentMetadata,
-  BadRequestException,
-} from '@nestjs/common';
+import { PipeTransform, Injectable, BadRequestException } from '@nestjs/common';
 
 @Injectable()
 export class SvgFileValidationPipe implements PipeTransform {
-  // @ts-ignore
-  transform(value: Express.Multer.File, _metadata: ArgumentMetadata) {
+  transform(value: Express.Multer.File) {
     if (!value) {
       throw new BadRequestException('No file provided.');
     }

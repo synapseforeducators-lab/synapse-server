@@ -267,8 +267,7 @@ export class UsersService {
   ) {
     const cleanedDto = Object.fromEntries(
       Object.entries(updateUserProfileDto).filter(
-        // @ts-ignore
-        ([_, value]) => value !== undefined,
+        ([, value]) => value !== undefined,
       ),
     );
     const userResponse = await this.usersRepository.findOneAndUpdate(
