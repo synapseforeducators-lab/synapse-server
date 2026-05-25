@@ -37,17 +37,17 @@ export class UsersController {
   @Post('update-profile')
   async UpdateUserProfile(
     @CurrentUser() user: User,
-    @Body() UpdateUserProfileDto: UpdateUserProfileDto,
+    @Body() updateUserProfileDto: UpdateUserProfileDto,
   ) {
-    return await this.userService.updateUserProfile(user, UpdateUserProfileDto);
+    return await this.userService.updateUserProfile(user, updateUserProfileDto);
   }
 
   @Post('update-password')
   async UpdatePassword(
     @CurrentUser() user: User,
-    @Body() UpdatePasswordDto: UpdatePasswordDto,
+    @Body() updatePasswordDto: UpdatePasswordDto,
   ) {
-    return await this.userService.updatePassword(user, UpdatePasswordDto);
+    return await this.userService.updatePassword(user, updatePasswordDto);
   }
 
   @Post('update-profile-picture')

@@ -267,6 +267,7 @@ export class UsersService {
   ) {
     const cleanedDto = Object.fromEntries(
       Object.entries(updateUserProfileDto).filter(
+        // @ts-ignore
         ([_, value]) => value !== undefined,
       ),
     );
