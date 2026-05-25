@@ -1,13 +1,15 @@
-import {
-  Column,
-  Entity,
-  JoinColumn,
-  ManyToOne,
-} from 'typeorm';
+import { Column, Entity, JoinColumn, ManyToOne } from 'typeorm';
 import { AbstractEntity } from '../../common';
 import { User } from 'src/user/entities/user.entity';
 import { School, SchoolRole } from './school.entity';
 
+export enum SchoolMemberStatus {
+  ACTIVE = 'ACTIVE',
+  PENDING = 'PENDING',
+  SUSPENDED = 'SUSPENDED',
+  DELETED = 'DELETED',
+  REJECTED = 'REJECTED',
+}
 
 @Entity('school_members')
 export class SchoolMember extends AbstractEntity<SchoolMember> {
@@ -31,6 +33,13 @@ export class SchoolMember extends AbstractEntity<SchoolMember> {
   })
   role: SchoolRole;
 
-  @Column({ default: true })
+  @Column({
+    type: 'enum',
+    enum: SchoolMemberStatus,
+    default: SchoolMemberStatus.PENDING,
+  })
+  status: SchoolMemberStatus;
+
+  @Column({ nullable: true })
   active: boolean;
 }

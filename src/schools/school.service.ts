@@ -8,6 +8,7 @@ import { CloudinaryService } from 'src/common/cloudinary/cloudinary.service';
 import { User } from 'src/user/entities/user.entity';
 import { SchoolMembersRepository } from './repository/school-members.repository';
 import { UpdateSchoolDto } from './dto/update-school.dto';
+import { SchoolMemberStatus } from './entities/school-member.entity';
 
 @Injectable()
 export class SchoolsService {
@@ -95,11 +96,66 @@ export class SchoolsService {
       id: schoolMember.schoolId,
     });
 
+    school['school_id'] = school.id;
     delete school.id;
     delete school.updated_at;
     delete school.created_at;
     delete school.owner;
     delete school.ownerId;
     return school;
+  }
+
+  async getAllSchoolMembers(
+    schoolId: string,
+    user: User,
+    search?: string,
+    status?: SchoolMemberStatus,
+  ) {
+    const schoolMemberExit = await this.schoolMembersRepository.findOne({
+      userId: user.id,
+      schoolId,
+    });
+
+    if (!schoolMemberExit) {
+      throw new BadRequestException('You are not a member of this school');
+    }
+
+    const qb = this.schoolMembersRepository
+      .qb('schoolMember')
+      .where('schoolMember.schoolId = :schoolId', { schoolId })
+      .andWhere('schoolMember.is_deleted = :is_deleted', { is_deleted: false })
+      .leftJoinAndSelect('schoolMember.user', 'user')
+      .select([
+        'schoolMember.id',
+        'schoolMember.role',
+        'schoolMember.active',
+        'schoolMember.is_suspended',
+        'user.first_name',
+        'user.last_name',
+        'user.email',
+        'user.profile_photo_url',
+      ]);
+
+    if (search?.trim()) {
+      const searchTerm = `%${search.trim().toLowerCase()}%`;
+      qb.andWhere(
+        '(LOWER(user.first_name) LIKE :search OR LOWER(user.last_name) LIKE :search OR LOWER(user.email) LIKE :search)',
+        { search: searchTerm },
+      );
+    }
+
+    if (status) {
+      qb.andWhere('schoolMember.status = :status', { status });
+    }
+
+    const memberList = await qb
+      .orderBy('schoolMember.created_at', 'DESC')
+      .getMany();
+
+    if (!memberList || memberList.length === 0) {
+      return null;
+    }
+
+    return memberList;
   }
 }

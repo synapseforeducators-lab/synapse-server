@@ -1,6 +1,7 @@
 import { Logger } from '@nestjs/common';
 import {
   EntityManager,
+  FindOptionsOrder,
   FindOptionsRelations,
   FindOptionsWhere,
   Repository,
@@ -49,10 +50,22 @@ export abstract class AbstractRepository<T extends AbstractEntity<T>> {
   async find(where: FindOptionsWhere<T>) {
     return this.repository.findBy(where);
   }
+  async findWithRelation(
+    where: FindOptionsWhere<T>,
+    relations?: FindOptionsRelations<T>,
+    select?: (keyof T)[],
+    order?: FindOptionsOrder<T>,
+  ) {
+    return this.repository.find({ where, relations, order, select });
+  }
   async count(where: FindOptionsWhere<T>) {
     return this.repository.count({ where });
   }
-  async increment(where: FindOptionsWhere<T>, propertyPath: string, value: number | string) {
+  async increment(
+    where: FindOptionsWhere<T>,
+    propertyPath: string,
+    value: number | string,
+  ) {
     return this.repository.increment(where, propertyPath, value);
   }
 
@@ -108,5 +121,4 @@ export abstract class AbstractRepository<T extends AbstractEntity<T>> {
   qb(alias: string) {
     return this.repository.createQueryBuilder(alias);
   }
-
 }

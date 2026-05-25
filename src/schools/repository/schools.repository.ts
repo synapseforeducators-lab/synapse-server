@@ -10,7 +10,10 @@ import {
 import { School, SchoolRole } from '../entities/school.entity';
 import { CreateSchoolDto } from '../dto/create-school.dto';
 import { User } from 'src/user/entities/user.entity';
-import { SchoolMember } from '../entities/school-member.entity';
+import {
+  SchoolMember,
+  SchoolMemberStatus,
+} from '../entities/school-member.entity';
 
 @Injectable()
 export class SchoolsRepository extends AbstractRepository<School> {
@@ -46,6 +49,7 @@ export class SchoolsRepository extends AbstractRepository<School> {
           schoolId: school.id,
           userId: user.id,
           role: SchoolRole.OWNER,
+          status: SchoolMemberStatus.ACTIVE,
           active: true,
         });
       },

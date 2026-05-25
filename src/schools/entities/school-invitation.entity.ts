@@ -2,7 +2,6 @@ import { Column, Entity, Index, JoinColumn, ManyToOne } from 'typeorm';
 import { AbstractEntity } from '../../common';
 import { User } from 'src/user/entities/user.entity';
 import { School, SchoolRole } from './school.entity';
-import { Team } from '../../teams/entities/team.entity';
 
 export enum InvitationStatus {
   PENDING = 'PENDING',
@@ -30,13 +29,6 @@ export class SchoolInvitation extends AbstractEntity<SchoolInvitation> {
   })
   role: SchoolRole;
 
-  @Column({ nullable: true })
-  teamId?: string;
-
-  @ManyToOne(() => Team, { nullable: true })
-  @JoinColumn({ name: 'teamId' })
-  team?: Team;
-
   @Column({ unique: true })
   token: string;
 
@@ -56,4 +48,7 @@ export class SchoolInvitation extends AbstractEntity<SchoolInvitation> {
 
   @Column({ nullable: true })
   acceptedAt?: Date;
+
+  @Column({ nullable: true })
+  expiresAt?: Date;
 }

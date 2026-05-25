@@ -14,11 +14,11 @@ import { SupportModule } from './support/support.module';
 import { CurriculumModule } from './curriculum/curriculum.module';
 import { SubjectModule } from './subject/subject.module';
 import { SchoolModule } from './schools/school.module';
-import { TeamsModule } from './teams/teams.module';
 import { BillingModule } from './billing/billing.module';
 import { SchemesModule } from './schemes/schemes.module';
 import { NotesModule } from './notes/notes.module';
 import { UsageModule } from './usage/usage.module';
+import { AcademicSessionsModule } from './academic-sessions/academic-sessions.module';
 
 @Module({
   imports: [
@@ -49,11 +49,11 @@ import { UsageModule } from './usage/usage.module';
     CurriculumModule,
     SubjectModule,
     SchoolModule,
-    TeamsModule,
     BillingModule,
     SchemesModule,
     NotesModule,
     UsageModule,
+    AcademicSessionsModule,
   ],
   controllers: [AppController],
   providers: [AppService],
