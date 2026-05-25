@@ -1,12 +1,6 @@
 import { AbstractEntity } from 'src/common';
 import { User } from 'src/user/entities/user.entity';
-import {
-  Column,
-  Entity,
-  ManyToOne,
-  OneToMany,
- 
-} from 'typeorm';
+import { Column, Entity, ManyToOne, OneToMany } from 'typeorm';
 import { CurriculumItem } from './curriculum-entity.entity';
 import { School } from 'src/schools/entities/school.entity';
 

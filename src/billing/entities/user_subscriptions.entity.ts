@@ -1,10 +1,5 @@
 import { User } from 'src/user/entities/user.entity';
-import {
-  Entity,
-  Column,
-  ManyToOne,
-
-} from 'typeorm';
+import { Entity, Column, ManyToOne } from 'typeorm';
 import { BillingPlan } from '../enum/billing-plan.enum';
 import { AbstractEntity } from 'src/common/database/abstract.entity';
 import { SubscriptionStatus } from '../enum/subscription-status.enum';

@@ -1,4 +1,4 @@
-import { IsEmail, IsEnum,  IsString  } from 'class-validator';
+import { IsEmail, IsEnum, IsString } from 'class-validator';
 import { SchoolRole } from '../entities/school.entity';
 import { ApiProperty } from '@nestjs/swagger';
 

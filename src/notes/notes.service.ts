@@ -17,7 +17,7 @@ export class NotesService {
   }
 
   update(id: number, updateNoteDto: UpdateNoteDto) {
-    return {updateNoteDto, id};
+    return { updateNoteDto, id };
   }
 
   remove(id: number) {

@@ -1,9 +1,4 @@
-import {
-  Entity,
-  Column,
-
-  Index,
-} from 'typeorm';
+import { Entity, Column, Index } from 'typeorm';
 import { UsageType } from '../enums/usage-type.enum';
 import { AbstractEntity } from 'src/common/database/abstract.entity';
 

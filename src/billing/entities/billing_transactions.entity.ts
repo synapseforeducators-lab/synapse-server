@@ -1,7 +1,4 @@
-import {
-  Entity,
-  Column,
-} from 'typeorm';
+import { Entity, Column } from 'typeorm';
 import { BillingPlan } from '../enum/billing-plan.enum';
 import { BillingStatus } from '../enum/billing-status.enum';
 import { AbstractEntity } from 'src/common';

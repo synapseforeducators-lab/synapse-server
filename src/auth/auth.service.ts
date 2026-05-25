@@ -15,9 +15,7 @@ import {
   VerifySignupDto,
 } from 'src/user/dto';
 import { customResponse } from 'src/common/util';
-import {
-  GetUserByEmailDto,
-} from 'src/user/dto/get-user.dto';
+import { GetUserByEmailDto } from 'src/user/dto/get-user.dto';
 import { User } from 'src/user/entities/user.entity';
 import { TokenPayload } from 'src/common/interfaces';
 import refreshJwtConfig from './config/refresh-jwt.config';

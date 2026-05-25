@@ -1,11 +1,7 @@
 import { InjectRepository } from '@nestjs/typeorm';
 import { AbstractRepository } from '../../common';
 import { EntityManager, Repository } from 'typeorm';
-import {
-  Injectable,
-  Logger,
-  NotFoundException,
-} from '@nestjs/common';
+import { Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { School, SchoolRole } from '../entities/school.entity';
 import { CreateSchoolDto } from '../dto/create-school.dto';
 import { User } from 'src/user/entities/user.entity';

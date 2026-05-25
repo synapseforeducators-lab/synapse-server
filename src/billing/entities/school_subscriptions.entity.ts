@@ -1,10 +1,5 @@
 import { School } from 'src/schools/entities/school.entity';
-import {
-  Entity,
-  Column,
-  ManyToOne,
-
-} from 'typeorm';
+import { Entity, Column, ManyToOne } from 'typeorm';
 import { BillingPlan } from '../enum/billing-plan.enum';
 import { SubscriptionStatus } from '../enum/subscription-status.enum';
 import { AbstractEntity } from 'src/common';

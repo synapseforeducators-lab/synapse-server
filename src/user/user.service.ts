@@ -14,14 +14,11 @@ import { UsersRepository } from './repository/users.repository';
 import * as bcrypt from 'bcryptjs';
 import { GetUserByEmailDto } from './dto/get-user.dto';
 import { User } from './entities/user.entity';
-import {
-  customResponse,
-  otpGenerator,
-} from 'src/common/util';
+import { customResponse, otpGenerator } from 'src/common/util';
 import { TokenPayload } from 'src/common/interfaces';
-import {  UserLoginDto } from 'src/auth/dto';
+import { UserLoginDto } from 'src/auth/dto';
 import { ConfigService } from '@nestjs/config';
-import {  VerificationCodeUserCase } from './enums/user.enum';
+import { VerificationCodeUserCase } from './enums/user.enum';
 import { UpdateEmailDto } from './dto/update-email.dto';
 import {
   UpdatePasswordDto,
