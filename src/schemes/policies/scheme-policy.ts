@@ -1,5 +1,4 @@
-import { SchoolRole } from "src/schools/entities/school.entity";
-
+import { SchoolRole } from 'src/schools/entities/school.entity';
 
 export class SchemePolicy {
   static canEdit(params: {
@@ -8,37 +7,20 @@ export class SchemePolicy {
     currentUserId: string;
 
     schoolRole?: SchoolRole;
-
   }) {
     return (
-      params.createdById ===
-        params.currentUserId ||
-
-      params.schoolRole ===
-        SchoolRole.OWNER ||
-
-      params.schoolRole ===
-        SchoolRole.ADMIN ||
-
-      params.schoolRole ===
-        SchoolRole.TEACHER
+      params.createdById === params.currentUserId ||
+      params.schoolRole === SchoolRole.OWNER ||
+      params.schoolRole === SchoolRole.ADMIN ||
+      params.schoolRole === SchoolRole.TEACHER
     );
   }
 
-  static canPublish(params: {
-    schoolRole?: SchoolRole;
-
-  }) {
+  static canPublish(params: { schoolRole?: SchoolRole }) {
     return (
-      params.schoolRole ===
-        SchoolRole.OWNER ||
-
-      params.schoolRole ===
-        SchoolRole.ADMIN ||
-
-      params.schoolRole ===
-        SchoolRole.TEACHER
+      params.schoolRole === SchoolRole.OWNER ||
+      params.schoolRole === SchoolRole.ADMIN ||
+      params.schoolRole === SchoolRole.TEACHER
     );
   }
-    
 }

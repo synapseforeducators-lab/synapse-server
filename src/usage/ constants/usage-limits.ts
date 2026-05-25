@@ -1,5 +1,5 @@
-import { BillingPlan } from "src/billing/enum/billing-plan.enum";
-import { UsageType } from "../enums/usage-type.enum";
+import { BillingPlan } from 'src/billing/enum/billing-plan.enum';
+import { UsageType } from '../enums/usage-type.enum';
 
 export const USAGE_LIMITS = {
   [BillingPlan.FREE]: {

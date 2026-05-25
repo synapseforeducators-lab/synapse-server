@@ -47,4 +47,3 @@ export class CreateSchoolDto {
   @IsString()
   country?: string;
 }
-

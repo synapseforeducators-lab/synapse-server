@@ -8,8 +8,6 @@ import {
   Length,
 } from 'class-validator';
 
-
-
 export class SignupUserDto {
   @ApiProperty()
   @IsNotEmpty()

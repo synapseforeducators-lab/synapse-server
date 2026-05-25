@@ -22,43 +22,26 @@ import { UsageType } from 'src/usage/enums/usage-type.enum';
 import { UsageLimitGuard } from 'src/usage/guards/usage-limit.guard';
 import { UsageInterceptor } from 'src/usage/interceptors/usage.interceptor';
 
-
 @Controller('schemes')
 export class SchemesController {
-  constructor(
-    private readonly schemesService: SchemesService,
-  ) {}
+  constructor(private readonly schemesService: SchemesService) {}
 
   @Post()
   @UsageLimit(UsageType.SCHEME)
   @UseGuards(UsageLimitGuard)
   @UseInterceptors(UsageInterceptor)
-  async create(
-    @Req() req,
-    @Body() dto: CreateSchemeDto,
-  ) {
-    return this.schemesService.create(
-      req.user.id,
-      dto,
-    );
+  async create(@Req() req, @Body() dto: CreateSchemeDto) {
+    return this.schemesService.create(req.user.id, dto);
   }
 
   @Get()
-  async findAll(
-    @Query() query: any,
-  ) {
-    return this.schemesService.findAll(
-      query,
-    );
+  async findAll(@Query() query: any) {
+    return this.schemesService.findAll(query);
   }
 
   @Get(':id')
-  async findOne(
-    @Param('id') id: string,
-  ) {
-    return this.schemesService.findOne(
-      id,
-    );
+  async findOne(@Param('id') id: string) {
+    return this.schemesService.findOne(id);
   }
 
   @Patch(':id')
@@ -69,11 +52,7 @@ export class SchemesController {
 
     @Body() dto: UpdateSchemeDto,
   ) {
-    return this.schemesService.update(
-      id,
-      req.user,
-      dto,
-    );
+    return this.schemesService.update(id, req.user, dto);
   }
 
   @Patch(':id/publish')
@@ -82,10 +61,7 @@ export class SchemesController {
 
     @Req() req,
   ) {
-    return this.schemesService.publish(
-      id,
-      req.user,
-    );
+    return this.schemesService.publish(id, req.user);
   }
 
   @Patch(':id/archive')
@@ -94,10 +70,7 @@ export class SchemesController {
 
     @Req() req,
   ) {
-    return this.schemesService.archive(
-      id,
-      req.user,
-    );
+    return this.schemesService.archive(id, req.user);
   }
 
   @Post(':id/duplicate')
@@ -106,10 +79,7 @@ export class SchemesController {
 
     @Req() req,
   ) {
-    return this.schemesService.duplicate(
-      id,
-      req.user,
-    );
+    return this.schemesService.duplicate(id, req.user);
   }
 
   @Delete(':id')
@@ -118,9 +88,6 @@ export class SchemesController {
 
     @Req() req,
   ) {
-    return this.schemesService.remove(
-      id,
-      req.user,
-    );
+    return this.schemesService.remove(id, req.user);
   }
 }

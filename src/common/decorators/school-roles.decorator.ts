@@ -1,4 +1,3 @@
-
 import { SetMetadata } from '@nestjs/common';
 import { SchoolRole } from 'src/schools/entities/school.entity';
 

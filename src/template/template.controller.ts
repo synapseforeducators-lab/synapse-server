@@ -35,7 +35,7 @@ export class TemplateController {
     @CurrentUser() user: User,
     @Body() createTemplateDto: CreateTemplateDto,
   ) {
-    return  await this.templateService.createTemplate(user, createTemplateDto);
+    return await this.templateService.createTemplate(user, createTemplateDto);
   }
 
   /**

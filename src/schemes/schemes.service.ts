@@ -13,43 +13,29 @@ import { UpdateSchemeDto } from './dto/update-scheme.dto';
 import { SchemePolicy } from './policies/scheme-policy';
 import { SchemeStatus } from './enums/scheme-status.enum';
 
-
 @Injectable()
 export class SchemesService {
-  constructor(
-    private readonly schemeRepo: SchemeRepository,
-  ) {}
+  constructor(private readonly schemeRepo: SchemeRepository) {}
 
-  async create(
-    userId: string,
-    dto: CreateSchemeDto,
-  ) {
-    const scheme =
-      this.schemeRepo.create({
-        ...dto,
+  async create(userId: string, dto: CreateSchemeDto) {
+    const scheme = this.schemeRepo.create({
+      ...dto,
 
-        createdById: userId,
+      createdById: userId,
 
-        version: 1,
+      version: 1,
 
-        status: SchemeStatus.DRAFT,
-      });
+      status: SchemeStatus.DRAFT,
+    });
 
-    return this.schemeRepo.save(
-      scheme,
-    );
+    return this.schemeRepo.save(scheme);
   }
 
   async findAll(filters?: any) {
     return this.schemeRepo.find({
       where: filters,
 
-      relations: [
-        'curriculum',
-        'school',
-        'team',
-        'academicSession',
-      ],
+      relations: ['curriculum', 'school', 'team', 'academicSession'],
 
       order: {
         createdAt: 'DESC',
@@ -58,172 +44,116 @@ export class SchemesService {
   }
 
   async findOne(id: string) {
-    const scheme =
-      await this.schemeRepo.findOne({
-        where: { id },
+    const scheme = await this.schemeRepo.findOne({
+      where: { id },
 
-        relations: [
-          'curriculum',
-          'school',
-          'team',
-          'academicSession',
-          'createdBy',
-        ],
-      });
+      relations: [
+        'curriculum',
+        'school',
+        'team',
+        'academicSession',
+        'createdBy',
+      ],
+    });
 
     if (!scheme) {
-      throw new NotFoundException(
-        'Scheme not found',
-      );
+      throw new NotFoundException('Scheme not found');
     }
 
     return scheme;
   }
 
-  async update(
-    id: string,
-    currentUser: any,
-    dto: UpdateSchemeDto,
-  ) {
-    const scheme =
-      await this.findOne(id);
+  async update(id: string, currentUser: any, dto: UpdateSchemeDto) {
+    const scheme = await this.findOne(id);
 
-    const canEdit =
-      SchemePolicy.canEdit({
-        createdById:
-          scheme.createdById,
+    const canEdit = SchemePolicy.canEdit({
+      createdById: scheme.createdById,
 
-        currentUserId:
-          currentUser.id,
-      });
+      currentUserId: currentUser.id,
+    });
 
     if (!canEdit) {
-      throw new ForbiddenException(
-        'You cannot edit this scheme',
-      );
+      throw new ForbiddenException('You cannot edit this scheme');
     }
 
     Object.assign(scheme, dto);
 
-    scheme.updatedById =
-      currentUser.id;
+    scheme.updatedById = currentUser.id;
 
     scheme.version += 1;
 
-    return this.schemeRepo.save(
-      scheme,
-    );
+    return this.schemeRepo.save(scheme);
   }
 
-  async publish(
-    id: string,
-    currentUser: any,
-  ) {
-    const scheme =
-      await this.findOne(id);
+  async publish(id: string, currentUser: any) {
+    const scheme = await this.findOne(id);
 
-    const canPublish =
-      SchemePolicy.canPublish({});
+    const canPublish = SchemePolicy.canPublish({});
 
     if (!canPublish) {
-      throw new ForbiddenException(
-        'You cannot publish this scheme',
-      );
+      throw new ForbiddenException('You cannot publish this scheme');
     }
 
-    scheme.status =
-      SchemeStatus.PUBLISHED;
+    scheme.status = SchemeStatus.PUBLISHED;
 
     scheme.published = true;
 
-    scheme.updatedById =
-      currentUser.id;
+    scheme.updatedById = currentUser.id;
 
-    return this.schemeRepo.save(
-      scheme,
-    );
+    return this.schemeRepo.save(scheme);
   }
 
-  async archive(
-    id: string,
-    currentUser: any,
-  ) {
-    const scheme =
-      await this.findOne(id);
+  async archive(id: string, currentUser: any) {
+    const scheme = await this.findOne(id);
 
-    scheme.status =
-      SchemeStatus.ARCHIVED;
+    scheme.status = SchemeStatus.ARCHIVED;
 
-    scheme.updatedById =
-      currentUser.id;
+    scheme.updatedById = currentUser.id;
 
-    return this.schemeRepo.save(
-      scheme,
-    );
+    return this.schemeRepo.save(scheme);
   }
 
-  async duplicate(
-    id: string,
-    currentUser: any,
-  ) {
-    const scheme =
-      await this.findOne(id);
+  async duplicate(id: string, currentUser: any) {
+    const scheme = await this.findOne(id);
 
-    const duplicate =
-      this.schemeRepo.create({
-        subject: scheme.subject,
+    const duplicate = this.schemeRepo.create({
+      subject: scheme.subject,
 
-        className: scheme.className,
+      className: scheme.className,
 
-        term: scheme.term,
+      term: scheme.term,
 
-        curriculumId:
-          scheme.curriculumId,
+      curriculumId: scheme.curriculumId,
 
-        schoolId: scheme.schoolId,
+      schoolId: scheme.schoolId,
 
+      academicSessionId: scheme.academicSessionId,
 
-        academicSessionId:
-          scheme.academicSessionId,
+      weeks: scheme.weeks,
 
-        weeks: scheme.weeks,
+      copiedFromSchemeId: scheme.id,
 
-        copiedFromSchemeId:
-          scheme.id,
+      createdById: currentUser.id,
 
-        createdById:
-          currentUser.id,
+      version: 1,
 
-        version: 1,
+      status: SchemeStatus.DRAFT,
+    });
 
-        status: SchemeStatus.DRAFT,
-      });
-
-    return this.schemeRepo.save(
-      duplicate,
-    );
+    return this.schemeRepo.save(duplicate);
   }
 
-  async remove(
-    id: string,
-    currentUser: any,
-  ) {
-    const scheme =
-      await this.findOne(id);
+  async remove(id: string, currentUser: any) {
+    const scheme = await this.findOne(id);
 
-    const canEdit =
-      SchemePolicy.canEdit({
-        createdById:
-          scheme.createdById,
+    const canEdit = SchemePolicy.canEdit({
+      createdById: scheme.createdById,
 
-        currentUserId:
-          currentUser.id,
-      });
+      currentUserId: currentUser.id,
+    });
 
     if (!canEdit) {
-      throw new ForbiddenException(
-        'You cannot delete this scheme',
-      );
+      throw new ForbiddenException('You cannot delete this scheme');
     }
 
     return this.schemeRepo.delete({

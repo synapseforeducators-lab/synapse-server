@@ -7,11 +7,8 @@ import {
 import * as crypto from 'crypto';
 import dayjs from 'dayjs';
 
-
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-
-
 
 import { PaystackService } from './paystack/paystack.service';
 import { BILLING_PLANS } from './constants/plan';
@@ -33,179 +30,117 @@ export class BillingService {
     private readonly paystack: PaystackService,
   ) {}
 
-  async initializeCheckout(
-    user: any,
-    plan: BillingPlan,
-  ) {
-    const planConfig =
-      BILLING_PLANS[plan];
+  async initializeCheckout(user: any, plan: BillingPlan) {
+    const planConfig = BILLING_PLANS[plan];
 
     if (!planConfig) {
-      throw new BadRequestException(
-        'Invalid billing plan',
-      );
+      throw new BadRequestException('Invalid billing plan');
     }
 
-    const reference =
-      `txn_${crypto.randomUUID()}`;
+    const reference = `txn_${crypto.randomUUID()}`;
 
-    const transaction =
-      await this.transactionRepo.save({
+    const transaction = await this.transactionRepo.save({
+      userId: user.id,
+      reference,
+      amount: planConfig.price,
+      currency: 'NGN',
+      email: user.email,
+      plan,
+      status: BillingStatus.PENDING,
+    });
+
+    const payment = await this.paystack.initializeTransaction({
+      email: user.email,
+      amount: planConfig.price * 100,
+      reference,
+      metadata: {
         userId: user.id,
-        reference,
-        amount: planConfig.price,
-        currency: 'NGN',
-        email: user.email,
         plan,
-        status: BillingStatus.PENDING,
-      });
+      },
+    });
 
-    const payment =
-      await this.paystack.initializeTransaction({
-        email: user.email,
-        amount: planConfig.price * 100,
-        reference,
-        metadata: {
-          userId: user.id,
-          plan,
-        },
-      });
+    transaction.authorizationUrl = payment.authorization_url;
 
-    transaction.authorizationUrl =
-      payment.authorization_url;
-
-    await this.transactionRepo.save(
-      transaction,
-    );
+    await this.transactionRepo.save(transaction);
 
     return payment;
   }
 
-  async verifyTransaction(
-    reference: string,
-  ) {
-    const verification =
-      await this.paystack.verifyTransaction(
-        reference,
-      );
+  async verifyTransaction(reference: string) {
+    const verification = await this.paystack.verifyTransaction(reference);
 
-    if (
-      verification.status !== 'success'
-    ) {
-      throw new BadRequestException(
-        'Payment failed',
-      );
+    if (verification.status !== 'success') {
+      throw new BadRequestException('Payment failed');
     }
 
-    const transaction =
-      await this.transactionRepo.findOne({
-        where: { reference },
-      });
+    const transaction = await this.transactionRepo.findOne({
+      where: { reference },
+    });
 
     if (!transaction) {
-      throw new NotFoundException(
-        'Transaction not found',
-      );
+      throw new NotFoundException('Transaction not found');
     }
 
-    if (
-      transaction.status ===
-      BillingStatus.SUCCESS
-    ) {
+    if (transaction.status === BillingStatus.SUCCESS) {
       return transaction;
     }
 
-    transaction.status =
-      BillingStatus.SUCCESS;
+    transaction.status = BillingStatus.SUCCESS;
 
     transaction.paidAt = new Date();
 
-    transaction.gatewayResponse =
-      verification.gateway_response;
+    transaction.gatewayResponse = verification.gateway_response;
 
-    transaction.channel =
-      verification.channel;
+    transaction.channel = verification.channel;
 
-    await this.transactionRepo.save(
-      transaction,
-    );
+    await this.transactionRepo.save(transaction);
 
-    await this.activateSubscription(
-      transaction,
-    );
+    await this.activateSubscription(transaction);
 
     return transaction;
   }
 
-  async activateSubscription(
-    transaction: BillingTransaction,
-  ) {
-    let subscription =
-      await this.subscriptionRepo.findOne({
-        where: {
-          userId: transaction.userId,
-        },
-      });
+  async activateSubscription(transaction: BillingTransaction) {
+    let subscription = await this.subscriptionRepo.findOne({
+      where: {
+        userId: transaction.userId,
+      },
+    });
 
     if (!subscription) {
-      subscription =
-        this.subscriptionRepo.create({
-          userId: transaction.userId,
-        });
+      subscription = this.subscriptionRepo.create({
+        userId: transaction.userId,
+      });
     }
 
-    const duration =
-      transaction.plan.includes(
-        'YEARLY',
-      )
-        ? 1
-        : 1;
+    const duration = transaction.plan.includes('YEARLY') ? 1 : 1;
 
-    const unit =
-      transaction.plan.includes(
-        'YEARLY',
-      )
-        ? 'year'
-        : 'month';
+    const unit = transaction.plan.includes('YEARLY') ? 'year' : 'month';
 
-    subscription.plan =
-      transaction.plan;
+    subscription.plan = transaction.plan;
 
-    subscription.status =
-      SubscriptionStatus.ACTIVE;
+    subscription.status = SubscriptionStatus.ACTIVE;
 
-    subscription.currentPeriodStart =
-      new Date();
+    subscription.currentPeriodStart = new Date();
 
-    subscription.currentPeriodEnd =
-      dayjs()
-        .add(duration, unit as any)
-        .toDate();
+    subscription.currentPeriodEnd = dayjs()
+      .add(duration, unit as any)
+      .toDate();
 
-    await this.subscriptionRepo.save(
-      subscription,
-    );
+    await this.subscriptionRepo.save(subscription);
   }
 
-  async cancelSubscription(
-    subscriptionId: string,
-  ) {
-    const subscription =
-      await this.subscriptionRepo.findOne({
-        where: { id: subscriptionId },
-      });
+  async cancelSubscription(subscriptionId: string) {
+    const subscription = await this.subscriptionRepo.findOne({
+      where: { id: subscriptionId },
+    });
 
     if (!subscription) {
-      throw new NotFoundException(
-        'Subscription not found',
-      );
+      throw new NotFoundException('Subscription not found');
     }
 
-    subscription.cancelAtPeriodEnd =
-      true;
+    subscription.cancelAtPeriodEnd = true;
 
-    return this.subscriptionRepo.save(
-      subscription,
-    );
+    return this.subscriptionRepo.save(subscription);
   }
 }

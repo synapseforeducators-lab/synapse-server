@@ -2,20 +2,15 @@ import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import axios from 'axios';
 
-
 @Injectable()
 export class PaystackService {
   private readonly baseUrl = 'https://api.paystack.co';
 
-  constructor(
-    private readonly config: ConfigService,
-  ) {}
+  constructor(private readonly config: ConfigService) {}
 
   private headers() {
     return {
-      Authorization: `Bearer ${this.config.get(
-        'PAYSTACK_SECRET_KEY',
-      )}`,
+      Authorization: `Bearer ${this.config.get('PAYSTACK_SECRET_KEY')}`,
       'Content-Type': 'application/json',
     };
   }
@@ -54,13 +49,9 @@ export class PaystackService {
     amount: number;
     interval: 'monthly' | 'annually';
   }) {
-    const response = await axios.post(
-      `${this.baseUrl}/plan`,
-      data,
-      {
-        headers: this.headers(),
-      },
-    );
+    const response = await axios.post(`${this.baseUrl}/plan`, data, {
+      headers: this.headers(),
+    });
 
     return response.data.data;
   }
@@ -70,21 +61,14 @@ export class PaystackService {
     first_name?: string;
     last_name?: string;
   }) {
-    const response = await axios.post(
-      `${this.baseUrl}/customer`,
-      data,
-      {
-        headers: this.headers(),
-      },
-    );
+    const response = await axios.post(`${this.baseUrl}/customer`, data, {
+      headers: this.headers(),
+    });
 
     return response.data.data;
   }
 
-  async disableSubscription(
-    subscriptionCode: string,
-    emailToken: string,
-  ) {
+  async disableSubscription(subscriptionCode: string, emailToken: string) {
     const response = await axios.post(
       `${this.baseUrl}/subscription/disable`,
       {

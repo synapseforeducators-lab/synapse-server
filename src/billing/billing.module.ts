@@ -16,8 +16,6 @@ import { BillingTransaction } from './entities/billing_transactions.entity';
 import { SchoolSubscription } from './entities/school_subscriptions.entity';
 import { UserSubscription } from './entities/user_subscriptions.entity';
 
-
-
 @Module({
   imports: [
     TypeOrmModule.forFeature([
@@ -37,9 +35,6 @@ import { UserSubscription } from './entities/user_subscriptions.entity';
     AccessResolverService,
   ],
 
-  exports: [
-    BillingService,
-    AccessResolverService,
-  ],
+  exports: [BillingService, AccessResolverService],
 })
 export class BillingModule {}

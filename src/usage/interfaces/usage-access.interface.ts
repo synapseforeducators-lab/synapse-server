@@ -1,4 +1,4 @@
-import { BillingPlan } from "src/billing/enum/billing-plan.enum";
+import { BillingPlan } from 'src/billing/enum/billing-plan.enum';
 export interface UsageAccess {
   allowed: boolean;
 

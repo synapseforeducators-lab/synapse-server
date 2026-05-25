@@ -1,12 +1,18 @@
-import { User } from "src/user/entities/user.entity";
-import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, CreateDateColumn, UpdateDateColumn } from "typeorm";
-import { BillingPlan } from "../enum/billing-plan.enum";
-import { AbstractEntity } from "src/common/database/abstract.entity";
-import { SubscriptionStatus } from "../enum/subscription-status.enum";
+import { User } from 'src/user/entities/user.entity';
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  ManyToOne,
+  CreateDateColumn,
+  UpdateDateColumn,
+} from 'typeorm';
+import { BillingPlan } from '../enum/billing-plan.enum';
+import { AbstractEntity } from 'src/common/database/abstract.entity';
+import { SubscriptionStatus } from '../enum/subscription-status.enum';
 
 @Entity('user_subscriptions')
-export class UserSubscription  extends AbstractEntity<UserSubscription> {
-
+export class UserSubscription extends AbstractEntity<UserSubscription> {
   @Column({ unique: true })
   userId: string;
 
@@ -48,6 +54,4 @@ export class UserSubscription  extends AbstractEntity<UserSubscription> {
 
   @Column({ nullable: true })
   paystackEmailToken?: string;
-
-
 }

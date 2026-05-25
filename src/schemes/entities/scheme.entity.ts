@@ -37,7 +37,6 @@ export class SchemeOfWork extends AbstractEntity<SchemeOfWork> {
   @JoinColumn({ name: 'schoolId' })
   school?: School;
 
-
   @Column()
   academicSessionId: string;
 

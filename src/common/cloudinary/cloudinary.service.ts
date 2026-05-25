@@ -17,15 +17,15 @@ export class CloudinaryService {
     });
   }
 
-async uploadImageToCloudinary(file: Express.Multer.File) {
-  try {
-    const res = await this.uploadImage(file);
-    return res.secure_url; // ✅ return only the image URL
-  } catch (e) {
-    console.error('Cloudinary upload error:', e);
-    throw new BadRequestException('Invalid file type.');
+  async uploadImageToCloudinary(file: Express.Multer.File) {
+    try {
+      const res = await this.uploadImage(file);
+      return res.secure_url; // ✅ return only the image URL
+    } catch (e) {
+      console.error('Cloudinary upload error:', e);
+      throw new BadRequestException('Invalid file type.');
+    }
   }
-}
 
   async uploadMultipleImagesToCloudinary(files: Express.Multer.File[]) {
     if (!files || !files.length) {

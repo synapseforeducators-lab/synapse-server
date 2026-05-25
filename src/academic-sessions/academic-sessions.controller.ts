@@ -16,9 +16,7 @@ import { UpdateAcademicSessionDto } from './dto/update-academic-session.dto';
 
 @Controller('academic-sessions')
 export class AcademicSessionsController {
-  constructor(
-    private readonly service: AcademicSessionsService,
-  ) {}
+  constructor(private readonly service: AcademicSessionsService) {}
 
   @Post()
   create(@Body() dto: CreateAcademicSessionDto) {
@@ -36,10 +34,7 @@ export class AcademicSessionsController {
   }
 
   @Patch(':id')
-  update(
-    @Param('id') id: string,
-    @Body() dto: UpdateAcademicSessionDto,
-  ) {
+  update(@Param('id') id: string, @Body() dto: UpdateAcademicSessionDto) {
     return this.service.update(id, dto);
   }
 

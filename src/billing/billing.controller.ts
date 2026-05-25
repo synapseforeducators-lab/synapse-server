@@ -21,14 +21,8 @@ export class BillingController {
   ) {}
 
   @Post('checkout')
-  async checkout(
-    @Req() req,
-    @Body('plan') plan,
-  ) {
-    return this.billingService.initializeCheckout(
-      req.user,
-      plan,
-    );
+  async checkout(@Req() req, @Body('plan') plan) {
+    return this.billingService.initializeCheckout(req.user, plan);
   }
 
   @Get('verify')
@@ -36,9 +30,7 @@ export class BillingController {
     @Query('reference')
     reference: string,
   ) {
-    return this.billingService.verifyTransaction(
-      reference,
-    );
+    return this.billingService.verifyTransaction(reference);
   }
 
   @Post('webhook/paystack')
@@ -47,9 +39,6 @@ export class BillingController {
     @Headers('x-paystack-signature')
     signature: string,
   ) {
-    return this.webhookService.handle(
-      req.body,
-      signature,
-    );
+    return this.webhookService.handle(req.body, signature);
   }
 }

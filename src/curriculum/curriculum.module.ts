@@ -8,7 +8,7 @@ import { CurriculumRepository } from './repository/curriculums.repository';
 
 @Module({
   imports: [DatabaseModule.forFeature([Curriculum, CurriculumItem])],
-  controllers: [ CurriculumController],
-  providers: [CurriculumService, CurriculumRepository ],
+  controllers: [CurriculumController],
+  providers: [CurriculumService, CurriculumRepository],
 })
 export class CurriculumModule {}

@@ -1,12 +1,15 @@
-import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn } from "typeorm";
-import { BillingPlan } from "../enum/billing-plan.enum";
-import { BillingStatus } from "../enum/billing-status.enum";
-import { AbstractEntity } from "src/common";
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  CreateDateColumn,
+} from 'typeorm';
+import { BillingPlan } from '../enum/billing-plan.enum';
+import { BillingStatus } from '../enum/billing-status.enum';
+import { AbstractEntity } from 'src/common';
 
 @Entity('billing_transactions')
-export class BillingTransaction  extends AbstractEntity<BillingTransaction> {
-
-
+export class BillingTransaction extends AbstractEntity<BillingTransaction> {
   @Column()
   reference: string;
 
@@ -51,6 +54,4 @@ export class BillingTransaction  extends AbstractEntity<BillingTransaction> {
 
   @Column({ type: 'jsonb', nullable: true })
   metadata?: Record<string, any>;
-
-
 }

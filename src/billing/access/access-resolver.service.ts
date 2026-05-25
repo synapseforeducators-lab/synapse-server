@@ -8,8 +8,6 @@ import { UserSubscription } from '../entities/user_subscriptions.entity';
 import { BillingPlan } from '../enum/billing-plan.enum';
 import { SubscriptionStatus } from '../enum/subscription-status.enum';
 
-
-
 @Injectable()
 export class AccessResolverService {
   constructor(
@@ -24,25 +22,21 @@ export class AccessResolverService {
   ) {}
 
   async resolve(userId: string) {
-    const schoolMember =
-      await this.schoolMemberRepo.findOne({
-        where: {
-          userId,
-          active: true,
-        },
-      });
+    const schoolMember = await this.schoolMemberRepo.findOne({
+      where: {
+        userId,
+        active: true,
+      },
+    });
 
     if (schoolMember) {
-      const schoolSubscription =
-        await this.schoolSubRepo.findOne({
-          where: {
-            schoolId:
-              schoolMember.schoolId,
+      const schoolSubscription = await this.schoolSubRepo.findOne({
+        where: {
+          schoolId: schoolMember.schoolId,
 
-            status:
-              SubscriptionStatus.ACTIVE,
-          },
-        });
+          status: SubscriptionStatus.ACTIVE,
+        },
+      });
 
       if (schoolSubscription) {
         return {
@@ -53,15 +47,13 @@ export class AccessResolverService {
       }
     }
 
-    const userSubscription =
-      await this.userSubRepo.findOne({
-        where: {
-          userId,
+    const userSubscription = await this.userSubRepo.findOne({
+      where: {
+        userId,
 
-          status:
-            SubscriptionStatus.ACTIVE,
-        },
-      });
+        status: SubscriptionStatus.ACTIVE,
+      },
+    });
 
     if (userSubscription) {
       return {

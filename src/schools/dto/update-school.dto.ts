@@ -47,4 +47,3 @@ export class UpdateSchoolDto {
   @IsString()
   country?: string;
 }
-

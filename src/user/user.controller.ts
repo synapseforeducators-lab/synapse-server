@@ -25,9 +25,7 @@ import {
 @Controller('users')
 @UseGuards(JwtAuthGuard)
 export class UsersController {
-  constructor(
-    private readonly userService: UsersService,
-  ) {}
+  constructor(private readonly userService: UsersService) {}
 
   // @Post('/verify-nin')
   // async verifyNIN(
@@ -42,13 +40,8 @@ export class UsersController {
     @CurrentUser() user: User,
     @Body() UpdateUserProfileDto: UpdateUserProfileDto,
   ) {
-    return await this.userService.updateUserProfile(
-      user,
-      UpdateUserProfileDto,
-    );
+    return await this.userService.updateUserProfile(user, UpdateUserProfileDto);
   }
-  
-
 
   @Post('update-password')
   async UpdatePassword(
@@ -76,6 +69,4 @@ export class UsersController {
   ) {
     return await this.userService.updateProfilePicture(user, file);
   }
-
-
 }
