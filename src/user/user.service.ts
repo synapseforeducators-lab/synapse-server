@@ -272,7 +272,7 @@ export class UsersService {
     );
     const userResponse = await this.usersRepository.findOneAndUpdate(
       { id: user.id },
-      cleanedDto,
+      { ...cleanedDto, is_complete_profile: true },
     );
 
     if (!userResponse)
