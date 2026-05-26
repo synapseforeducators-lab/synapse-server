@@ -7,7 +7,6 @@ import {
   UseGuards,
   Get,
   Param,
-  Patch,
   Query,
   ParseUUIDPipe,
 } from '@nestjs/common';
@@ -28,10 +27,7 @@ import { FileSizeValidationPipe } from 'src/user/pipes/profile-image.pipe';
 import { memoryStorage } from 'multer';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth/jwt-auth.guard';
 import { SchoolInvitationsService } from './school-invitations.service';
-import {
-  AcceptInviteUserDto,
-  InviteSchoolMemberDto,
-} from './dto/invite-school-member.dto';
+import { InviteSchoolMemberDto } from './dto/invite-school-member.dto';
 import { SchoolRoleGuard } from 'src/common/guards/school-role.guard';
 import { SchoolRole } from './entities/school.entity';
 import { SchoolMemberStatus } from './entities/school-member.entity';
