@@ -4,7 +4,10 @@ import { EntityManager, Repository } from 'typeorm';
 import { Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { SchoolInvitation } from '../entities/school-invitation.entity';
 import { InvitationStatus } from '../entities/school-invitation.entity';
-import { SchoolMember } from '../entities/school-member.entity';
+import {
+  SchoolMember,
+  SchoolMemberStatus,
+} from '../entities/school-member.entity';
 import { AcceptInviteUserDto } from '../dto/invite-school-member.dto';
 import { User } from 'src/user/entities/user.entity';
 import * as bcrypt from 'bcryptjs';
@@ -77,6 +80,7 @@ export class SchoolInvitationRepository extends AbstractRepository<SchoolInvitat
       newMember.user = user;
       newMember.role = invitation.role;
       newMember.active = true;
+      newMember.status = SchoolMemberStatus.ACTIVE;
 
       await manager.save(SchoolMember, newMember);
 
