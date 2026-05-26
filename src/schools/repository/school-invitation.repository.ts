@@ -36,14 +36,14 @@ export class SchoolInvitationRepository extends AbstractRepository<SchoolInvitat
     let user: User;
     return this.entityManager.transaction(async (manager) => {
       user = await manager.findOne(User, {
-        where: { email: dto.email },
+        where: { email: dto.email.toLowerCase().trim() },
       });
 
       if (!user) {
         user = await manager.save(User, {
-          first_name: dto.first_name,
-          last_name: dto.last_name,
-          email: dto.email,
+          first_name: dto.first_name.toLowerCase().trim(),
+          last_name: dto.last_name.toLowerCase().trim(),
+          email: dto.email.toLowerCase().trim(),
           password: await bcrypt.hash(dto.password, 10),
           email_verified: true,
         });
@@ -53,17 +53,17 @@ export class SchoolInvitationRepository extends AbstractRepository<SchoolInvitat
       });
 
       if (!invitation) {
-        throw new NotFoundException('INVITATION_NOT_FOUND');
+        throw new NotFoundException('invitation not found');
       }
 
       if (invitation.status !== InvitationStatus.PENDING) {
-        throw new NotFoundException('INVITATION_ALREADY_USED');
+        throw new NotFoundException('invitation already used');
       }
 
       if (invitation.expiresAt && new Date() > invitation.expiresAt) {
         invitation.status = InvitationStatus.EXPIRED;
         await manager.save(SchoolInvitation, invitation);
-        throw new NotFoundException('INVITATION_EXPIRED');
+        throw new NotFoundException('invitation expired');
       }
 
       const existingMember = await manager.findOne(SchoolMember, {
@@ -71,7 +71,7 @@ export class SchoolInvitationRepository extends AbstractRepository<SchoolInvitat
       });
 
       if (existingMember) {
-        throw new NotFoundException('ALREADY_MEMBER');
+        throw new NotFoundException('already existing member of school');
       }
 
       const newMember = new SchoolMember({});
