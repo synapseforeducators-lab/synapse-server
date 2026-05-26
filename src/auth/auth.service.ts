@@ -141,14 +141,14 @@ export class AuthService {
   }
 
   private sanitizeUser(user: User) {
-    const {
-      password,
-      created_at,
-      updated_at,
-      id,
-      verification_token,
-      ...safeUser
-    } = user as any;
+    const safeUser = { ...user };
+
+    delete safeUser.password;
+    delete safeUser.created_at;
+    delete safeUser.updated_at;
+    delete safeUser.id;
+    delete safeUser.verification_token;
+
     return safeUser;
   }
 
