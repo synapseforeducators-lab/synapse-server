@@ -88,5 +88,4 @@ export class SchoolInvitationRepository extends AbstractRepository<SchoolInvitat
       return { invitation };
     });
   }
- 
 }

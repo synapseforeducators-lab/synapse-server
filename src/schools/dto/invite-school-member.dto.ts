@@ -1,4 +1,12 @@
-import { IsAlpha, IsEmail, IsEnum, IsNotEmpty, IsString, IsStrongPassword, Length } from 'class-validator';
+import {
+  IsAlpha,
+  IsEmail,
+  IsEnum,
+  IsNotEmpty,
+  IsString,
+  IsStrongPassword,
+  Length,
+} from 'class-validator';
 import { SchoolRole } from '../entities/school.entity';
 import { ApiProperty } from '@nestjs/swagger';
 
@@ -19,7 +27,6 @@ export class InviteSchoolMemberDto {
   @IsEnum(SchoolRole)
   role: SchoolRole;
 }
-
 
 export class AcceptInviteUserDto {
   @ApiProperty()

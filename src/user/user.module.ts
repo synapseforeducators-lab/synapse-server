@@ -10,7 +10,12 @@ import { CloudinaryModule } from 'src/common/cloudinary/cloudinary.module';
 import { SchoolModule } from 'src/schools/school.module';
 
 @Module({
-  imports: [DatabaseModule.forFeature([User]), EmailModule, CloudinaryModule, SchoolModule],
+  imports: [
+    DatabaseModule.forFeature([User]),
+    EmailModule,
+    CloudinaryModule,
+    SchoolModule,
+  ],
   controllers: [UsersController],
   providers: [UsersService, UsersRepository],
   exports: [UsersService],
