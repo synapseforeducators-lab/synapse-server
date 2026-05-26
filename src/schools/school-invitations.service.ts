@@ -71,7 +71,7 @@ export class SchoolInvitationsService {
       // to: dto.email,
       to: 'synapseforeducators@gmail.com',
       subject: `${school.school_name} - Invitation to Join`,
-      html: `Hi ${dto.first_name}, <br/> <br/> You have been invited to join ${school.school_name}:  <br/><br/> <a href="${this.configService.get('FRONTEND_URL')}/accept-invitation?token=${invitation.token}&email=${dto.email}&first_name=${dto.first_name}&last_name=${dto.last_name}">Accept Invitation</a> <a href="${this.configService.get('FRONTEND_URL')}/cancel-invitation?token=${invitation.token}">Cancel Invitation</a>`,
+      html: `Hi ${dto.first_name}, <br/> <br/> You have been invited to join ${school.school_name}:  <br/><br/> <a href="${this.configService.get('FRONTEND_URL')}/accept-invitation?token=${invitation.token}&email=${dto.email}&first_name=${dto.first_name}&last_name=${dto.last_name}">Accept Invitation</a> <a href="${this.configService.get('FRONTEND_URL')}/cancel-invitation?invitationId=${invitation.id}">Cancel Invitation</a>`,
     });
 
     console.log({ data, error, invitation });
