@@ -335,11 +335,6 @@ export class UsersService {
   //   return customResponse('Profile Updated', updatedUser);
   // }
 
-
- 
-
-
-
   // async verifyBvn(user: User, verifyBvnDto: VerifyBvnDto) {
   //   await this.payStackService.createCustomer(user.email, user.id);
   //   if (user?.bvn_verified && user?.wallet?.paystackCustomerId)
