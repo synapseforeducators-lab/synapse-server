@@ -113,19 +113,6 @@ export class SchoolController {
     return await this.invitationsService.invite(schoolId, user.id, dto);
   }
 
-  @Post('invitations/accept')
-  async acceptInvitation(
-    @Body()
-    dto: AcceptInviteUserDto,
-  ) {
-    return await this.invitationsService.acceptInvitation(dto);
-  }
-
-  @Patch('invitations/:id/cancel')
-  async cancelInvitation(@Param('id') id: string) {
-    return await this.invitationsService.cancelInvitation(id);
-  }
-
   @Get(':schoolId/invitations')
   async getInvitations(
     @Param('schoolId', new ParseUUIDPipe())

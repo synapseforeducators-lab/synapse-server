@@ -11,6 +11,7 @@ import { SchoolInvitation } from './entities/school-invitation.entity';
 import { SchoolInvitationsService } from './school-invitations.service';
 import { SchoolInvitationRepository } from './repository/school-invitation.repository';
 import { EmailModule } from 'src/common/email/email.module';
+import { SchoolInviteController } from './school-invite.controller';
 
 @Module({
   imports: [
@@ -18,7 +19,7 @@ import { EmailModule } from 'src/common/email/email.module';
     CloudinaryModule,
     EmailModule,
   ],
-  controllers: [SchoolController],
+  controllers: [SchoolController, SchoolInviteController],
   providers: [
     SchoolsService,
     SchoolsRepository,
