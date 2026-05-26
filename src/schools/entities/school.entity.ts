@@ -5,8 +5,13 @@ import { User } from 'src/user/entities/user.entity';
 export enum SchoolRole {
   OWNER = 'OWNER',
   ADMIN = 'ADMIN',
+  SUBJECT_TEACHER = 'SUBJECT_TEACHER',
   TEACHER = 'TEACHER',
-  STAFF = 'STAFF',
+  HEAD_TEACHER = 'HEAD_TEACHER',
+  PRINCIPAL = 'PRINCIPAL',
+  VICE_PRINCIPAL = 'VICE_PRINCIPAL',
+  DIRECTOR = 'DIRECTOR',
+  HEAD_OF_DEPARTMENT = 'HEAD_OF_DEPARTMENT',
 }
 
 export enum SchoolTypeEnum {
