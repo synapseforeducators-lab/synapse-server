@@ -10,13 +10,20 @@ import {
   Patch,
   Req,
   Query,
+  ParseUUIDPipe,
 } from '@nestjs/common';
 import { CreateSchoolDto } from './dto/create-school.dto';
 import { UpdateSchoolDto } from './dto/update-school.dto';
 import { SchoolsService } from './school.service';
 import { CurrentUser, SchoolRoles } from 'src/common/decorators';
 import { User } from 'src/user/entities/user.entity';
-import { ApiBearerAuth, ApiBody, ApiConsumes, ApiTags } from '@nestjs/swagger';
+import {
+  ApiBearerAuth,
+  ApiBody,
+  ApiConsumes,
+  ApiTags,
+  ApiQuery,
+} from '@nestjs/swagger';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { FileSizeValidationPipe } from 'src/user/pipes/profile-image.pipe';
 import { memoryStorage } from 'multer';
@@ -56,9 +63,11 @@ export class SchoolController {
   @Get(':schoolId/school-members')
   @SchoolRoles(SchoolRole.ADMIN, SchoolRole.OWNER)
   @UseGuards(SchoolRoleGuard)
+  @ApiQuery({ name: 'search', required: false })
+  @ApiQuery({ name: 'status', required: false })
   findAll(
     @CurrentUser() user: User,
-    @Param('schoolId') schoolId: string,
+    @Param('schoolId', new ParseUUIDPipe()) schoolId: string,
     @Query('search') search?: string,
     @Query('status') status?: SchoolMemberStatus,
   ) {
@@ -93,7 +102,7 @@ export class SchoolController {
   @SchoolRoles(SchoolRole.ADMIN, SchoolRole.OWNER)
   @UseGuards(SchoolRoleGuard)
   async inviteMember(
-    @Param('schoolId')
+    @Param('schoolId', new ParseUUIDPipe())
     schoolId: string,
     @CurrentUser() user: User,
     @Body()
@@ -118,7 +127,7 @@ export class SchoolController {
 
   @Get(':schoolId/invitations')
   async getInvitations(
-    @Param('schoolId')
+    @Param('schoolId', new ParseUUIDPipe())
     schoolId: string,
   ) {
     return await this.invitationsService.getSchoolInvitations(schoolId);

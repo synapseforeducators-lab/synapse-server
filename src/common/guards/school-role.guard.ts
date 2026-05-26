@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   CanActivate,
   ExecutionContext,
   ForbiddenException,
@@ -44,6 +45,10 @@ export class SchoolRoleGuard implements CanActivate {
       throw new ForbiddenException('School ID required');
     }
 
+    if (!this.isUuid(schoolId)) {
+      throw new BadRequestException('Invalid schoolId');
+    }
+
     const membership = await this.schoolMemberRepository.findOne({
       where: {
         schoolId,
@@ -62,5 +67,14 @@ export class SchoolRoleGuard implements CanActivate {
     request.schoolMembership = membership;
 
     return true;
+  }
+
+  private isUuid(value?: string): boolean {
+    return (
+      typeof value === 'string' &&
+      /^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/.test(
+        value,
+      )
+    );
   }
 }

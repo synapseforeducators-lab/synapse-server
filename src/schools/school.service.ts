@@ -117,19 +117,18 @@ export class SchoolsService {
     });
 
     if (!schoolMemberExit) {
-      throw new BadRequestException('You are not a member of this school');
+      return [];
     }
 
     const qb = this.schoolMembersRepository
       .qb('schoolMember')
       .where('schoolMember.schoolId = :schoolId', { schoolId })
-      .andWhere('schoolMember.is_deleted = :is_deleted', { is_deleted: false })
       .leftJoinAndSelect('schoolMember.user', 'user')
       .select([
         'schoolMember.id',
         'schoolMember.role',
+        'schoolMember.status',
         'schoolMember.active',
-        'schoolMember.is_suspended',
         'user.first_name',
         'user.last_name',
         'user.email',
@@ -153,7 +152,7 @@ export class SchoolsService {
       .getMany();
 
     if (!memberList || memberList.length === 0) {
-      return null;
+      return [];
     }
 
     return memberList;
