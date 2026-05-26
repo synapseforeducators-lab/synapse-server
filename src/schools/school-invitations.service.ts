@@ -4,7 +4,10 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import * as crypto from 'crypto';
-import { InviteSchoolMemberDto } from './dto/invite-school-member.dto';
+import {
+  AcceptInviteUserDto,
+  InviteSchoolMemberDto,
+} from './dto/invite-school-member.dto';
 import { InvitationStatus } from './entities/school-invitation.entity';
 import { SchoolInvitationRepository } from './repository/school-invitation.repository';
 import { SchoolMembersRepository } from './repository/school-members.repository';
@@ -55,6 +58,7 @@ export class SchoolInvitationsService {
       role: dto.role,
       token,
       invitedById,
+      school: school,
       status: InvitationStatus.PENDING,
       expiresAt: dayjs().add(7, 'days').toDate(),
     });
@@ -67,7 +71,7 @@ export class SchoolInvitationsService {
       // to: dto.email,
       to: 'synapseforeducators@gmail.com',
       subject: `${school.school_name} - Invitation to Join`,
-      html: `Hi ${dto.first_name}, <br/> <br/> You have been invited to join ${school.school_name}:  <br/><br/> <a href="${this.configService.get('FRONTEND_URL')}/accept-invitation?token=${invitation.token}">Accept Invitation</a> <a href="${this.configService.get('FRONTEND_URL')}/cancel-invitation?token=${invitation.token}">Cancel Invitation</a>`,
+      html: `Hi ${dto.first_name}, <br/> <br/> You have been invited to join ${school.school_name}:  <br/><br/> <a href="${this.configService.get('FRONTEND_URL')}/accept-invitation?token=${invitation.token}&email=${dto.email}&first_name=${dto.first_name}&last_name=${dto.last_name}">Accept Invitation</a> <a href="${this.configService.get('FRONTEND_URL')}/cancel-invitation?token=${invitation.token}">Cancel Invitation</a>`,
     });
 
     console.log({ data, error, invitation });
@@ -75,8 +79,15 @@ export class SchoolInvitationsService {
     return customResponse('Invitation sent successfully');
   }
 
-  async acceptInvitation(userId: string, token: string) {
-    return await this.invitationRepo.acceptInvitationTx(userId, token);
+  async acceptInvitation(dto: AcceptInviteUserDto) {
+    const { invitation } =
+      await this.invitationRepo.acceptInvitationNewUser(dto);
+
+    if (!invitation) {
+      throw new BadRequestException('Unable to accept invitation');
+    }
+
+    return customResponse('Invitation accepted successfully');
   }
 
   async cancelInvitation(id: string) {

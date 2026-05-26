@@ -5,6 +5,9 @@ import { Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { SchoolInvitation } from '../entities/school-invitation.entity';
 import { InvitationStatus } from '../entities/school-invitation.entity';
 import { SchoolMember } from '../entities/school-member.entity';
+import { AcceptInviteUserDto } from '../dto/invite-school-member.dto';
+import { User } from 'src/user/entities/user.entity';
+import * as bcrypt from 'bcryptjs';
 
 @Injectable()
 export class SchoolInvitationRepository extends AbstractRepository<SchoolInvitation> {
@@ -26,10 +29,24 @@ export class SchoolInvitationRepository extends AbstractRepository<SchoolInvitat
     return await this.entityManager.save(data);
   }
 
-  async acceptInvitationTx(userId: string, token: string) {
+  async acceptInvitationNewUser(dto: AcceptInviteUserDto) {
+    let user: User;
     return this.entityManager.transaction(async (manager) => {
+      user = await manager.findOne(User, {
+        where: { email: dto.email },
+      });
+
+      if (!user) {
+        user = await manager.save(User, {
+          first_name: dto.first_name,
+          last_name: dto.last_name,
+          email: dto.email,
+          password: await bcrypt.hash(dto.password, 10),
+          email_verified: true,
+        });
+      }
       const invitation = await manager.findOne(SchoolInvitation, {
-        where: { token },
+        where: { token: dto.token },
       });
 
       if (!invitation) {
@@ -47,7 +64,7 @@ export class SchoolInvitationRepository extends AbstractRepository<SchoolInvitat
       }
 
       const existingMember = await manager.findOne(SchoolMember, {
-        where: { schoolId: invitation.schoolId, userId },
+        where: { schoolId: invitation.schoolId, userId: user.id, user: user },
       });
 
       if (existingMember) {
@@ -56,7 +73,8 @@ export class SchoolInvitationRepository extends AbstractRepository<SchoolInvitat
 
       const newMember = new SchoolMember({});
       newMember.schoolId = invitation.schoolId;
-      newMember.userId = userId;
+      newMember.userId = user.id;
+      newMember.user = user;
       newMember.role = invitation.role;
       newMember.active = true;
 
@@ -70,4 +88,5 @@ export class SchoolInvitationRepository extends AbstractRepository<SchoolInvitat
       return { invitation };
     });
   }
+ 
 }
