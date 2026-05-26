@@ -11,6 +11,9 @@ export class User extends AbstractEntity<User> {
   @Column({ type: 'text', nullable: true })
   profile_photo_url?: string;
 
+  @Column({ type: 'text', nullable: true })
+  postal_address?: string;
+
   @Index()
   @Column({ type: 'text', nullable: true })
   first_name: string;

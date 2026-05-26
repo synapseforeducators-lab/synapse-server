@@ -70,30 +70,10 @@ export class AuthService {
     const { user } = await this.usersService.newPassword(newPasswordDto);
 
     if (user.email_verified) {
-      const tokenPayload: TokenPayload = {
-        id: user.id,
-        email: user.email,
-      };
-
-      const access_token = this.jwtService.sign(tokenPayload);
-      const refresh_token = this.jwtService.sign(
-        tokenPayload,
-        this.refreshTokenConfig,
+      return customResponse(
+        'Logged In Successful',
+        await this.buildAuthResponse(user, true),
       );
-
-      delete user.created_at;
-      delete user.updated_at;
-      delete user.password;
-      delete user.id;
-      delete user.verification_token;
-
-      return customResponse('Logged In Successful', {
-        token: {
-          access_token,
-          refresh_token,
-        },
-        user,
-      });
     }
 
     throw new BadRequestException('something weng wrong');
@@ -103,31 +83,10 @@ export class AuthService {
     const { user } = await this.usersService.verifySignup(verifySignupDto);
 
     if (user.email_verified) {
-      const tokenPayload: TokenPayload = {
-        id: user.id,
-        email: user.email,
-      };
-
-      const access_token = this.jwtService.sign(tokenPayload);
-      const refresh_token = this.jwtService.sign(
-        tokenPayload,
-        this.refreshTokenConfig,
+      return customResponse(
+        'Logged In Successful',
+        await this.buildAuthResponse(user, true),
       );
-
-      delete user.created_at;
-      delete user.updated_at;
-
-      delete user.password;
-      delete user.id;
-      delete user.verification_token;
-
-      return customResponse('Logged In Successful', {
-        token: {
-          access_token,
-          refresh_token,
-        },
-        user,
-      });
     }
 
     throw new BadRequestException('something weng wrong');
@@ -158,6 +117,13 @@ export class AuthService {
   }
 
   async userLogin(user: User) {
+    return customResponse(
+      'Logged In Successful',
+      await this.buildAuthResponse(user, true),
+    );
+  }
+
+  private createAuthPayload(user: User) {
     const tokenPayload: TokenPayload = {
       id: user.id,
       email: user.email,
@@ -165,29 +131,44 @@ export class AuthService {
 
     console.log(tokenPayload);
 
-    const access_token = this.jwtService.sign(tokenPayload);
-    const refresh_token = this.jwtService.sign(
-      tokenPayload,
-      this.refreshTokenConfig,
-    );
+    return {
+      access_token: this.jwtService.sign(tokenPayload),
+      refresh_token: this.jwtService.sign(
+        tokenPayload,
+        this.refreshTokenConfig,
+      ),
+    };
+  }
 
-    const school = await this.schoolService.findSchoolByUser(user);
+  private sanitizeUser(user: User) {
+    const {
+      password,
+      created_at,
+      updated_at,
+      id,
+      verification_token,
+      ...safeUser
+    } = user as any;
+    return safeUser;
+  }
 
-    delete user.password;
-    delete user.created_at;
-    delete user.updated_at;
-    delete user.id;
-    delete user.verification_token;
-
-    return customResponse('Logged In Successful', {
+  private async buildAuthResponse(user: User, includeSchool = false) {
+    const { access_token, refresh_token } = this.createAuthPayload(user);
+    const authResponse: any = {
       token: {
         access_token,
         refresh_token,
       },
-      user,
-      school,
-    });
+      user: this.sanitizeUser(user),
+    };
+
+    if (includeSchool) {
+      authResponse.school = await this.schoolService.findSchoolByUser(user);
+    }
+
+    return authResponse;
   }
+
   async refreshToken(user: User) {
     const tokenPayload: TokenPayload = {
       id: user.id,

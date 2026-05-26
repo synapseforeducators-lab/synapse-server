@@ -40,6 +40,12 @@ export class UpdateUserProfileDto {
   @ApiProperty()
   @IsOptional()
   @IsString()
+  @MinLength(3)
+  postal_address: string;
+
+  @ApiProperty()
+  @IsOptional()
+  @IsString()
   phone_number: string;
 }
 
