@@ -91,17 +91,9 @@ export class SchoolInvitationsService {
   }
 
   async cancelInvitation(id: string) {
-    const invitation = await this.invitationRepo.findOne({
+    return await this.invitationRepo.findOneAndDelete({
       id,
     });
-
-    if (!invitation) {
-      throw new NotFoundException('Invitation not found');
-    }
-
-    invitation.status = InvitationStatus.CANCELLED;
-
-    return this.invitationRepo.save(invitation);
   }
 
   async getSchoolInvitations(schoolId: string) {
