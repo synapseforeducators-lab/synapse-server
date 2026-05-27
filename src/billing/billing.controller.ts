@@ -6,23 +6,33 @@ import {
   Query,
   Req,
   Headers,
+  UseGuards,
 } from '@nestjs/common';
 
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { BillingService } from './billing.service';
-
 import { PaystackWebhookService } from './paystack/paystack-webhook.service';
+import { CurrentUser } from 'src/common/decorators';
+import { User } from 'src/user/entities/user.entity';
+import { CreateBillingDto } from './dto/create-billing.dto';
+import { JwtAuthGuard } from 'src/auth/guards/jwt-auth/jwt-auth.guard';
 
+@ApiTags('Billing')
 @Controller('billing')
 export class BillingController {
   constructor(
     private readonly billingService: BillingService,
-
     private readonly webhookService: PaystackWebhookService,
   ) {}
 
+  @ApiBearerAuth()
+  @UseGuards(JwtAuthGuard)
   @Post('checkout')
-  async checkout(@Req() req, @Body('plan') plan) {
-    return this.billingService.initializeCheckout(req.user, plan);
+  async checkout(
+    @CurrentUser() user: User,
+    @Body() createBillingDto: CreateBillingDto,
+  ) {
+    return this.billingService.initializeCheckout(user, createBillingDto.plan);
   }
 
   @Get('verify')

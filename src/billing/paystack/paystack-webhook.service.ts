@@ -1,12 +1,17 @@
 import { Injectable, ForbiddenException } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 
 import * as crypto from 'crypto';
 
 @Injectable()
 export class PaystackWebhookService {
+    constructor(
+  
+      private readonly configService: ConfigService,
+    ) {}
   verifySignature(payload: any, signature: string) {
     const hash = crypto
-      .createHmac('sha512', process.env.PAYSTACK_SECRET_KEY!)
+      .createHmac('sha512', this.configService.get('PAYSTACK_SECRET_KEY'))
       .update(JSON.stringify(payload))
       .digest('hex');
 

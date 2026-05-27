@@ -17,6 +17,7 @@ import { UserSubscription } from './entities/user_subscriptions.entity';
 import { BillingPlan } from './enum/billing-plan.enum';
 import { BillingStatus } from './enum/billing-status.enum';
 import { SubscriptionStatus } from './enum/subscription-status.enum';
+import { User } from 'src/user/entities/user.entity';
 
 @Injectable()
 export class BillingService {
@@ -30,7 +31,7 @@ export class BillingService {
     private readonly paystack: PaystackService,
   ) {}
 
-  async initializeCheckout(user: any, plan: BillingPlan) {
+  async initializeCheckout(user: User, plan: BillingPlan) {
     const planConfig = BILLING_PLANS[plan];
 
     if (!planConfig) {
