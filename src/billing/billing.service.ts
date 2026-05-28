@@ -5,7 +5,6 @@ import {
 } from '@nestjs/common';
 
 import * as crypto from 'crypto';
-import dayjs from 'dayjs';
 
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
@@ -14,7 +13,6 @@ import { PaystackService } from './paystack/paystack.service';
 import { BILLING_PLANS } from './constants/plan';
 import { BillingTransaction } from './entities/billing_transactions.entity';
 import { UserSubscription } from './entities/user_subscriptions.entity';
-import { BillingPlan } from './enum/billing-plan.enum';
 import { BillingStatus } from './enum/billing-status.enum';
 import { SubscriptionStatus } from './enum/subscription-status.enum';
 import { User } from 'src/user/entities/user.entity';
@@ -147,7 +145,7 @@ export class BillingService {
 
     subscription.currentPeriodStart = new Date();
 
-    let currentPeriodEnd = new Date();
+    const currentPeriodEnd = new Date();
 
     unit === 'month'
       ? currentPeriodEnd.setMonth(currentPeriodEnd.getMonth() + duration)

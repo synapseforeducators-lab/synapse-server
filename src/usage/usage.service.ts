@@ -1,7 +1,5 @@
 import { Injectable, ForbiddenException } from '@nestjs/common';
 
-import dayjs from 'dayjs';
-
 import { UsageRepository } from './repositories/usage.repository';
 import { AccessResolverService } from 'src/billing/access/access-resolver.service';
 import { UsageType } from './enums/usage-type.enum';
