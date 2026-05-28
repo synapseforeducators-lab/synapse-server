@@ -18,25 +18,47 @@ import { BillingPlan } from './enum/billing-plan.enum';
 import { BillingStatus } from './enum/billing-status.enum';
 import { SubscriptionStatus } from './enum/subscription-status.enum';
 import { User } from 'src/user/entities/user.entity';
+import {
+  BillingQueryParamsDto,
+  CreateBillingDto,
+} from './dto/create-billing.dto';
 
 @Injectable()
 export class BillingService {
   constructor(
     @InjectRepository(BillingTransaction)
     private readonly transactionRepo: Repository<BillingTransaction>,
-
     @InjectRepository(UserSubscription)
     private readonly subscriptionRepo: Repository<UserSubscription>,
-
     private readonly paystack: PaystackService,
   ) {}
 
-  async initializeCheckout(user: User, plan: BillingPlan) {
-    const planConfig = BILLING_PLANS[plan];
+  async initializeCheckout(user: User, createBillingDto: CreateBillingDto) {
+    const subscription = await this.getUserCurrentSubscription(user.id);
+
+    if (subscription && subscription.plan === createBillingDto.plan) {
+      throw new BadRequestException('Existing active subscription');
+    }
+
+    const planConfig = BILLING_PLANS[createBillingDto.plan];
 
     if (!planConfig) {
       throw new BadRequestException('Invalid billing plan');
     }
+
+    const planRes = await this.paystack.getSubscriptionList();
+
+    if (!planRes) {
+      throw new BadRequestException('Invalid billing plan');
+    }
+
+    const plan = planRes.find((plan) => {
+      if (plan.name === createBillingDto.plan) {
+        return plan;
+      }
+    });
+
+    console.log('Plan response:', plan);
 
     const reference = `txn_${crypto.randomUUID()}`;
 
@@ -46,19 +68,20 @@ export class BillingService {
       amount: planConfig.price,
       currency: 'NGN',
       email: user.email,
-      plan,
+      plan: createBillingDto.plan,
       status: BillingStatus.PENDING,
     });
+
+    console.log('transaction initialized:', transaction);
 
     const payment = await this.paystack.initializeTransaction({
       email: user.email,
       amount: planConfig.price * 100,
       reference,
-      metadata: {
-        userId: user.id,
-        plan,
-      },
+      plan: planRes.plan_code,
     });
+
+    console.log('Payment initialized:', payment);
 
     transaction.authorizationUrl = payment.authorization_url;
 
@@ -124,9 +147,13 @@ export class BillingService {
 
     subscription.currentPeriodStart = new Date();
 
-    subscription.currentPeriodEnd = dayjs()
-      .add(duration, unit as any)
-      .toDate();
+    let currentPeriodEnd = new Date();
+
+    unit === 'month'
+      ? currentPeriodEnd.setMonth(currentPeriodEnd.getMonth() + duration)
+      : currentPeriodEnd.setFullYear(currentPeriodEnd.getFullYear() + duration);
+
+    subscription.currentPeriodEnd = currentPeriodEnd;
 
     await this.subscriptionRepo.save(subscription);
   }
@@ -143,5 +170,50 @@ export class BillingService {
     subscription.cancelAtPeriodEnd = true;
 
     return this.subscriptionRepo.save(subscription);
+  }
+
+  async getSubscriptionList() {
+    return this.paystack.getSubscriptionList();
+  }
+  async getSubscriptionById(id: string) {
+    return this.paystack.getSubscriptionById(id);
+  }
+  async getUserCurrentSubscription(userId: string) {
+    const subscription = await this.subscriptionRepo.findOne({
+      where: { userId, status: SubscriptionStatus.ACTIVE },
+    });
+
+    if (!subscription) {
+      return null;
+    }
+
+    const oneDay = 24 * 60 * 60 * 1000;
+
+    const daysDifference =
+      (new Date(subscription.currentPeriodEnd).getTime() -
+        new Date(subscription.currentPeriodStart).getTime()) /
+      oneDay;
+
+    if (daysDifference < 1) {
+      subscription.status = SubscriptionStatus.EXPIRED;
+      return await this.subscriptionRepo.save(subscription);
+    }
+
+    return subscription;
+  }
+
+  async getSubscriptionDetails(id: string) {
+    return this.paystack.getSubscriptionById(id);
+  }
+
+  async getInvoiceList(user: User, dto: BillingQueryParamsDto) {
+    const { status, plan } = dto;
+    return await this.transactionRepo.find({
+      where: {
+        userId: user.id,
+        ...(status && { status }),
+        ...(plan && { plan }),
+      },
+    });
   }
 }

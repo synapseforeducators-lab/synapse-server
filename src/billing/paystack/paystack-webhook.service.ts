@@ -1,3 +1,4 @@
+import { BillingService } from './../billing.service';
 import { Injectable, ForbiddenException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 
@@ -5,10 +6,10 @@ import * as crypto from 'crypto';
 
 @Injectable()
 export class PaystackWebhookService {
-    constructor(
-  
-      private readonly configService: ConfigService,
-    ) {}
+  constructor(
+    private readonly configService: ConfigService,
+    private readonly billingService: BillingService,
+  ) {}
   verifySignature(payload: any, signature: string) {
     const hash = crypto
       .createHmac('sha512', this.configService.get('PAYSTACK_SECRET_KEY'))
@@ -38,7 +39,7 @@ export class PaystackWebhookService {
   }
 
   async handleChargeSuccess(payload: any) {
-    console.log('Charge success:', payload.data.reference);
+    await this.billingService.verifyTransaction(payload.data.reference);
   }
 
   async handleFailedInvoice(payload: any) {

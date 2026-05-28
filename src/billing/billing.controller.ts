@@ -14,7 +14,10 @@ import { BillingService } from './billing.service';
 import { PaystackWebhookService } from './paystack/paystack-webhook.service';
 import { CurrentUser } from 'src/common/decorators';
 import { User } from 'src/user/entities/user.entity';
-import { CreateBillingDto } from './dto/create-billing.dto';
+import {
+  BillingQueryParamsDto,
+  CreateBillingDto,
+} from './dto/create-billing.dto';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth/jwt-auth.guard';
 
 @ApiTags('Billing')
@@ -32,7 +35,14 @@ export class BillingController {
     @CurrentUser() user: User,
     @Body() createBillingDto: CreateBillingDto,
   ) {
-    return this.billingService.initializeCheckout(user, createBillingDto.plan);
+    return await this.billingService.initializeCheckout(user, createBillingDto);
+  }
+
+  @ApiBearerAuth()
+  @UseGuards(JwtAuthGuard)
+  @Get('active-subscription')
+  async getActiveSubscription(@CurrentUser() user: User) {
+    return await this.billingService.getUserCurrentSubscription(user.id);
   }
 
   @Get('verify')
@@ -40,7 +50,24 @@ export class BillingController {
     @Query('reference')
     reference: string,
   ) {
-    return this.billingService.verifyTransaction(reference);
+    return await this.billingService.verifyTransaction(reference);
+  }
+
+  @Get('subscriptions')
+  @ApiBearerAuth()
+  @UseGuards(JwtAuthGuard)
+  async getSubscriptions() {
+    return await this.billingService.getSubscriptionList();
+  }
+
+  @Get('invoice')
+  @ApiBearerAuth()
+  @UseGuards(JwtAuthGuard)
+  async getInvoiceList(
+    @CurrentUser() user: User,
+    @Query() dto: BillingQueryParamsDto,
+  ) {
+    return await this.billingService.getInvoiceList(user, dto);
   }
 
   @Post('webhook/paystack')
@@ -49,6 +76,6 @@ export class BillingController {
     @Headers('x-paystack-signature')
     signature: string,
   ) {
-    return this.webhookService.handle(req.body, signature);
+    return await this.webhookService.handle(req.body, signature);
   }
 }

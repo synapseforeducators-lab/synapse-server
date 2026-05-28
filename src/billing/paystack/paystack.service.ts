@@ -20,6 +20,7 @@ export class PaystackService {
     email: string;
     amount: number;
     reference: string;
+    plan: string;
     callback_url?: string;
     metadata?: Record<string, any>;
   }) {
@@ -68,6 +69,21 @@ export class PaystackService {
         headers: this.headers(),
       },
     );
+
+    return response.data.data;
+  }
+
+  async getSubscriptionList() {
+    const response = await axios.get(`${this.baseUrl}/plan`, {
+      headers: this.headers(),
+    });
+
+    return response.data.data;
+  }
+  async getSubscriptionById(id: string) {
+    const response = await axios.get(`${this.baseUrl}/plan/${id}`, {
+      headers: this.headers(),
+    });
 
     return response.data.data;
   }
