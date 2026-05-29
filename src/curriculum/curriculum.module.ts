@@ -3,7 +3,7 @@ import { CurriculumService } from './curriculum.service';
 import { CurriculumController } from './curriculum.controller';
 import { DatabaseModule } from 'src/common';
 import { Curriculum } from './entities/curriculum.entity';
-import { CurriculumItem } from './entities/curriculum-entity.entity';
+import { CurriculumItem } from './entities/curriculum-items.entity';
 import { CurriculumRepository } from './repository/curriculums.repository';
 
 @Module({

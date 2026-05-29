@@ -19,6 +19,7 @@ import { SchemesModule } from './schemes/schemes.module';
 import { NotesModule } from './notes/notes.module';
 import { UsageModule } from './usage/usage.module';
 import { AcademicSessionsModule } from './academic-sessions/academic-sessions.module';
+import { GradesModule } from './grades/grades.module';
 
 @Module({
   imports: [
@@ -54,6 +55,7 @@ import { AcademicSessionsModule } from './academic-sessions/academic-sessions.mo
     NotesModule,
     UsageModule,
     AcademicSessionsModule,
+    GradesModule,
   ],
   controllers: [AppController],
   providers: [AppService],

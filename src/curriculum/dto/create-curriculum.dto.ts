@@ -47,12 +47,12 @@ export class CreateCurriculumDto {
   @ApiProperty()
   @IsString()
   @IsNotEmpty()
-  subject: string;
+  subjectId: string;
 
   @ApiProperty()
   @IsString()
   @IsNotEmpty()
-  grade: string;
+  gradeId: string;
 
   @ApiProperty({ type: () => CreateCurriculumItemDto, isArray: true })
   @IsArray()

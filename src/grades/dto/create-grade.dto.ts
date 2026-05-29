@@ -1,8 +1,8 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { IsString } from 'class-validator';
 
-export class CreateSubjectDto {
+export class CreateGradeDto {
   @ApiProperty()
   @IsString()
-  subject: string;
+  grade: string;
 }

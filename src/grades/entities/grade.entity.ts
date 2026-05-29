@@ -1,8 +1,8 @@
-import { AbstractEntity } from 'src/common';
+    import { AbstractEntity } from 'src/common';
 import { BeforeInsert, Column, Entity } from 'typeorm';
 
-@Entity('subjects')
-export class Subject extends AbstractEntity<Subject> {
+@Entity('Grades')
+export class Grade extends AbstractEntity<Grade> {
   @Column({ type: 'text', unique: true })
   name: string;
 
@@ -10,7 +10,7 @@ export class Subject extends AbstractEntity<Subject> {
   is_archived: boolean;
 
   @BeforeInsert()
-  async formatSubjectName() {
+  async formatGradeName() {
     this.name = this.name.trim().toLowerCase();
   }
 }

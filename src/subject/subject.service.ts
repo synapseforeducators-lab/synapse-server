@@ -1,26 +1,83 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { CreateSubjectDto } from './dto/create-subject.dto';
 import { UpdateSubjectDto } from './dto/update-subject.dto';
+import { SubjectRepository } from './repository/subjects.repository';
+import { Subject } from './entities/subject.entity';
 
 @Injectable()
 export class SubjectService {
-  create(createSubjectDto: CreateSubjectDto) {
-    return createSubjectDto;
+  constructor(private readonly subjectRepository: SubjectRepository) {}
+  async create(createSubjectDto: CreateSubjectDto) {
+    const newSubject = new Subject({ name: createSubjectDto.subject });
+
+    const subjectRes = await this.subjectRepository.create(newSubject);
+
+    if (!subjectRes) {
+      throw new BadRequestException(
+        'Unable to create subject at the moment, try again later',
+      );
+    }
+
+    return subjectRes;
   }
 
-  findAll() {
-    return `This action returns all subject`;
+  async getAllSubjects() {
+    const subjectRes = await this.subjectRepository.findAndSelect({}, [
+      'id',
+      'name',
+    ]);
+
+    if (!subjectRes) {
+      throw new BadRequestException(
+        'Unable to get subject at the moment, try again later',
+      );
+    }
+
+    return subjectRes;
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} subject`;
+  async findOne(id: string) {
+    const subjectRes = await this.subjectRepository.findAndSelect(
+      { id: id, is_archived: false },
+      ['id', 'name'],
+    );
+
+    if (!subjectRes) {
+      throw new BadRequestException(
+        'Unable to get subject at the moment, try again later',
+      );
+    }
+
+    return subjectRes;
   }
 
-  update(id: number, updateSubjectDto: UpdateSubjectDto) {
-    return { updateSubjectDto, id };
+  async update(updateSubjectDto: UpdateSubjectDto) {
+    const subjectRes = await this.subjectRepository.findOneAndUpdate(
+      { id: updateSubjectDto.id },
+      updateSubjectDto,
+    );
+
+    if (!subjectRes) {
+      throw new BadRequestException(
+        'Unable to get subject at the moment, try again later',
+      );
+    }
+
+    return subjectRes;
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} subject`;
+  async remove(id: string) {
+    const subjectRes = await this.subjectRepository.findOneAndUpdate(
+      { id: id },
+      { is_archived: true },
+    );
+
+    if (!subjectRes) {
+      throw new BadRequestException(
+        'Unable to get subject at the moment, try again later',
+      );
+    }
+
+    return subjectRes;
   }
 }

@@ -1,19 +1,33 @@
 import { AbstractEntity } from 'src/common';
 import { User } from 'src/user/entities/user.entity';
 import { Column, Entity, ManyToOne, OneToMany } from 'typeorm';
-import { CurriculumItem } from './curriculum-entity.entity';
+import { CurriculumItem } from './curriculum-items.entity';
 import { School } from 'src/schools/entities/school.entity';
+import { JoinColumn } from 'typeorm';
+import { Subject } from 'src/subject/entities/subject.entity';
+import { Grade } from 'src/grades/entities/grade.entity';
 
 @Entity('curriculums')
 export class Curriculum extends AbstractEntity<Curriculum> {
   @Column()
   name: string;
 
-  @Column()
-  subject: string;
+  @Column({ nullable: true })
+  subjectId?: string | null;
+
+  @ManyToOne(() => Subject)
+  @JoinColumn({ name: 'subjectId' })
+  subject: Subject;
 
   @Column()
-  grade: string;
+  description: string;
+
+  @Column()
+  gradeId: string;
+
+  @ManyToOne(() => Grade)
+  @JoinColumn({ name: 'gradeId' })
+  grade: Grade;
 
   @ManyToOne(() => School, {
     nullable: true,

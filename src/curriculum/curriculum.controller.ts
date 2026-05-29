@@ -25,11 +25,7 @@ import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 export class CurriculumController {
   constructor(private readonly curriculumService: CurriculumService) {}
 
-  /**
-   * POST /curriculum
-   * Create a new curriculum. Scoped to the user's school automatically
-   * if they belong to one.
-   */
+
   @Post()
   create(
     @CurrentUser() user: User,
@@ -38,12 +34,6 @@ export class CurriculumController {
     return this.curriculumService.create(user, createCurriculumDto);
   }
 
-  /**
-   * GET /curriculum
-   * List all curricula visible to the current user:
-   *  - School curricula (if the user belongs to a school)
-   *  - Personal curricula with no school association
-   */
   @Get()
   findAll(@CurrentUser() user: User) {
     return this.curriculumService.getAllCurriculum(user);

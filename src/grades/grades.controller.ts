@@ -8,36 +8,37 @@ import {
   Delete,
   UseGuards,
 } from '@nestjs/common';
-import { SubjectService } from './subject.service';
-import { CreateSubjectDto } from './dto/create-subject.dto';
-import { UpdateSubjectDto } from './dto/update-subject.dto';
-import { Roles } from 'src/auth/decorators/role.decorators';
+import { GradesService } from './grades.service';
+import { CreateGradeDto } from './dto/create-grade.dto';
+import { UpdateGradeDto } from './dto/update-grade.dto';
 import { ApiBearerAuth } from '@nestjs/swagger';
+import { Roles } from 'src/auth/decorators/role.decorators';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth/jwt-auth.guard';
 import { RolesGuard } from 'src/auth/guards/roles/roles.guard';
+import { UpdateSubjectDto } from 'src/subject/dto/update-subject.dto';
 import { Role } from 'src/user/enums/role.enum';
 
-@Controller('subject')
-export class SubjectController {
-  constructor(private readonly subjectService: SubjectService) {}
+@Controller('grades')
+export class GradesController {
+  constructor(private readonly gradesService: GradesService) {}
 
   @Post()
   @ApiBearerAuth()
   @Roles(Role.ADMIN)
   @UseGuards(RolesGuard)
   @UseGuards(JwtAuthGuard)
-  create(@Body() createSubjectDto: CreateSubjectDto) {
-    return this.subjectService.create(createSubjectDto);
+  create(@Body() createGradeDto: CreateGradeDto) {
+    return this.gradesService.create(createGradeDto);
   }
 
   @Get()
-  findAll() {
-    return this.subjectService.getAllSubjects();
+  getAllGrades() {
+    return this.gradesService.getAllGrades();
   }
 
   @Get(':id')
   findOne(@Param('id') id: string) {
-    return this.subjectService.findOne(id);
+    return this.gradesService.findOne(id);
   }
 
   @Patch()
@@ -45,8 +46,8 @@ export class SubjectController {
   @Roles(Role.ADMIN)
   @UseGuards(RolesGuard)
   @UseGuards(JwtAuthGuard)
-  update(updateSubjectDto: UpdateSubjectDto) {
-    return this.subjectService.update(updateSubjectDto);
+  update(updateGradeDto: UpdateGradeDto) {
+    return this.gradesService.update(updateGradeDto);
   }
 
   @Delete(':id')
@@ -55,6 +56,6 @@ export class SubjectController {
   @UseGuards(RolesGuard)
   @UseGuards(JwtAuthGuard)
   remove(@Param('id') id: string) {
-    return this.subjectService.remove(id);
+    return this.gradesService.remove(id);
   }
 }

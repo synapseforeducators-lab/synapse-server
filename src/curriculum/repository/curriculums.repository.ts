@@ -12,9 +12,11 @@ import { Curriculum } from '../entities/curriculum.entity';
 import { CreateCurriculumDto } from '../dto/create-curriculum.dto';
 import { UpdateCurriculumDto } from '../dto/update-curriculum.dto';
 import { User } from 'src/user/entities/user.entity';
-import { CurriculumItem } from '../entities/curriculum-entity.entity';
+import { CurriculumItem } from '../entities/curriculum-items.entity';
 import { School } from 'src/schools/entities/school.entity';
 import { SchoolMember } from 'src/schools/entities/school-member.entity';
+import { Grade } from 'src/grades/entities/grade.entity';
+import { Subject } from 'src/subject/entities/subject.entity';
 
 @Injectable()
 export class CurriculumRepository extends AbstractRepository<Curriculum> {
@@ -67,11 +69,27 @@ export class CurriculumRepository extends AbstractRepository<Curriculum> {
             });
           }
 
+          const grade = await transactionalEntityManager.findOne(Grade, {
+            where: { id: createCurriculumDto.gradeId },
+          });
+          if (!grade) {
+            throw new BadRequestException('Invalid grade specified');
+          }
+
+          const subject = await transactionalEntityManager.findOne(Subject, {
+            where: { id: createCurriculumDto.subjectId },
+          });
+          if (!subject) {
+            throw new BadRequestException('Invalid subject specified');
+          }
+
           curriculum = this.repository.create({
             school: schoolExist ?? null,
             schoolId: schoolExist.id ?? null,
             createdBy: user,
             items: curriculumItems,
+            grade: grade,
+            subject: subject,
             ...curriculumData,
           });
 
