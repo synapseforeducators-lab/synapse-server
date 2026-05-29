@@ -15,7 +15,6 @@ import { ApiBearerAuth } from '@nestjs/swagger';
 import { Roles } from 'src/auth/decorators/role.decorators';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth/jwt-auth.guard';
 import { RolesGuard } from 'src/auth/guards/roles/roles.guard';
-import { UpdateSubjectDto } from 'src/subject/dto/update-subject.dto';
 import { Role } from 'src/user/enums/role.enum';
 
 @Controller('grades')
