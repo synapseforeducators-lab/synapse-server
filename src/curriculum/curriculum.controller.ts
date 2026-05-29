@@ -9,6 +9,7 @@ import {
   Patch,
   Post,
   UseGuards,
+  UseInterceptors,
 } from '@nestjs/common';
 import { CurriculumService } from './curriculum.service';
 import { CreateCurriculumDto } from './dto/create-curriculum.dto';
@@ -17,6 +18,10 @@ import { JwtAuthGuard } from 'src/auth/guards/jwt-auth/jwt-auth.guard';
 import { CurrentUser } from 'src/common/decorators';
 import { User } from 'src/user/entities/user.entity';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
+import { UsageLimit } from 'src/usage/decorators/usage-limit.decorator';
+import { UsageType } from 'src/usage/enums/usage-type.enum';
+import { UsageLimitGuard } from 'src/usage/guards/usage-limit.guard';
+import { UsageInterceptor } from 'src/usage/interceptors/usage.interceptor';
 
 @ApiTags('Curriculum')
 @ApiBearerAuth()
@@ -26,6 +31,9 @@ export class CurriculumController {
   constructor(private readonly curriculumService: CurriculumService) {}
 
   @Post()
+  @UsageLimit(UsageType.CURRICULUM)
+  @UseGuards(UsageLimitGuard)
+  @UseInterceptors(UsageInterceptor)
   create(
     @CurrentUser() user: User,
     @Body() createCurriculumDto: CreateCurriculumDto,

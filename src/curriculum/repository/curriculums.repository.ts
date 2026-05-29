@@ -85,7 +85,7 @@ export class CurriculumRepository extends AbstractRepository<Curriculum> {
 
           curriculum = this.repository.create({
             school: schoolExist ?? null,
-            schoolId: schoolExist.id ?? null,
+            schoolId: schoolExist?.id ?? null,
             createdBy: user,
             items: curriculumItems,
             grade: grade,

@@ -22,6 +22,7 @@ import {
   CreateBillingDto,
 } from './dto/create-billing.dto';
 import { SchoolSubscription } from './entities/school_subscriptions.entity';
+import { BillingPlan } from './enum/billing-plan.enum';
 
 @Injectable()
 export class BillingService {
@@ -41,7 +42,10 @@ export class BillingService {
       ? await this.getSchoolCurrentSubscription(user.id)
       : await this.getUserCurrentSubscription(user.id);
 
-    if (subscription && subscription.plan === createBillingDto.plan) {
+    if (
+      subscription.plan !== BillingPlan.FREE &&
+      subscription.plan === createBillingDto.plan
+    ) {
       throw new BadRequestException('Existing active subscription');
     }
 
@@ -220,7 +224,7 @@ export class BillingService {
     });
 
     if (!subscription) {
-      return null;
+      return { plan: BillingPlan.FREE };
     }
 
     const oneDay = 24 * 60 * 60 * 1000;
@@ -241,7 +245,7 @@ export class BillingService {
     const school = await this.schoolsService.findSchoolByUser(userId);
 
     if (!school) {
-      return null;
+      return { plan: BillingPlan.FREE };
     }
 
     const subscription = await this.schoolSubscriptionRepo.findOne({
@@ -249,7 +253,7 @@ export class BillingService {
     });
 
     if (!subscription) {
-      return null;
+      return { plan: BillingPlan.FREE };
     }
 
     const oneDay = 24 * 60 * 60 * 1000;

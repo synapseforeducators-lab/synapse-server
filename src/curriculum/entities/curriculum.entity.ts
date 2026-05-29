@@ -20,9 +20,6 @@ export class Curriculum extends AbstractEntity<Curriculum> {
   subject: Subject;
 
   @Column()
-  description: string;
-
-  @Column()
   gradeId: string;
 
   @ManyToOne(() => Grade)
