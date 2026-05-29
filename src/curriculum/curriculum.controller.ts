@@ -25,7 +25,6 @@ import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 export class CurriculumController {
   constructor(private readonly curriculumService: CurriculumService) {}
 
-
   @Post()
   create(
     @CurrentUser() user: User,

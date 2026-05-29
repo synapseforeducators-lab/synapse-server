@@ -1,4 +1,4 @@
-    import { AbstractEntity } from 'src/common';
+import { AbstractEntity } from 'src/common';
 import { BeforeInsert, Column, Entity } from 'typeorm';
 
 @Entity('Grades')

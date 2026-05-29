@@ -6,7 +6,7 @@ import { Grade } from './entities/grade.entity';
 
 @Injectable()
 export class GradesService {
-  constructor(private readonly gradeRepository:GradeRepository) {}
+  constructor(private readonly gradeRepository: GradeRepository) {}
   async create(createGradeDto: CreateGradeDto) {
     const newGrade = new Grade({ name: createGradeDto.grade });
 
