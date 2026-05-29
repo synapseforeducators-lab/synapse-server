@@ -21,7 +21,6 @@ import {
   BillingQueryParamsDto,
   CreateBillingDto,
 } from './dto/create-billing.dto';
-import { School } from 'src/schools/entities/school.entity';
 import { SchoolSubscription } from './entities/school_subscriptions.entity';
 
 @Injectable()
@@ -246,8 +245,7 @@ export class BillingService {
     }
 
     const subscription = await this.schoolSubscriptionRepo.findOne({
-      where: { schoolId: school.id, status: SubscriptionStatus.ACTIVE, },
-
+      where: { schoolId: school.id, status: SubscriptionStatus.ACTIVE },
     });
 
     if (!subscription) {
