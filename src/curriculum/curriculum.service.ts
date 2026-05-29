@@ -21,21 +21,7 @@ export class CurriculumService {
   }
 
   async getAllCurriculum(user: User) {
-    const currRes = await this.curriculumRepository
-      .qb('curriculums')
-      .where('curriculums.createdById = :createdById', { createdById: user.id })
-      .leftJoinAndSelect('curriculums.items', 'items')
-      .select([
-        'curriculums.name',
-        'curriculums.subject',
-        'curriculums.grade',
-        'items.theme',
-        'items.topic',
-        'items.performanceObjectives',
-        'items.content',
-        'items.order',
-      ])
-      .getMany();
+    const currRes = await this.curriculumRepository.getAllCurriculum(user);
 
     if (!currRes) {
       throw new BadRequestException('unable to get curriculum');
@@ -44,9 +30,15 @@ export class CurriculumService {
     return currRes;
   }
 
-  // async findOne(id: string, user: User): Promise<Curriculum> {
-  //   return this.curriculumRepository.findOneForUser(id, user);
-  // }
+  async getCurriculumById(id: string, user: User): Promise<Curriculum> {
+    const currRes = await this.curriculumRepository.getCurriculumById(id, user);
+
+    if (!currRes) {
+      throw new BadRequestException('unable to get curriculum');
+    }
+
+    return currRes;
+  }
 
   async update(
     id: string,

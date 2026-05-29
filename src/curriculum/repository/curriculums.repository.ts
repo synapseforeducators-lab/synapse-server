@@ -13,7 +13,7 @@ import { CreateCurriculumDto } from '../dto/create-curriculum.dto';
 import { UpdateCurriculumDto } from '../dto/update-curriculum.dto';
 import { User } from 'src/user/entities/user.entity';
 import { CurriculumItem } from '../entities/curriculum-items.entity';
-import { School } from 'src/schools/entities/school.entity';
+import { School, SchoolRole } from 'src/schools/entities/school.entity';
 import { SchoolMember } from 'src/schools/entities/school-member.entity';
 import { Grade } from 'src/grades/entities/grade.entity';
 import { Subject } from 'src/subject/entities/subject.entity';
@@ -110,6 +110,117 @@ export class CurriculumRepository extends AbstractRepository<Curriculum> {
       this.logger.error('Error creating curriculum', error);
       throw new BadRequestException('Error creating curriculum');
     }
+  }
+
+  async getAllCurriculum(user: User) {
+    const schoolMember = await this.entityManager.findOne(SchoolMember, {
+      select: { schoolId: true },
+      where: {
+        userId: user.id,
+        role:
+          SchoolRole.ADMIN ||
+          SchoolRole.OWNER ||
+          SchoolRole.HEAD_TEACHER ||
+          SchoolRole.PRINCIPAL ||
+          SchoolRole.VICE_PRINCIPAL ||
+          SchoolRole.DIRECTOR ||
+          SchoolRole.HEAD_OF_DEPARTMENT,
+      },
+    });
+
+    if (schoolMember) {
+      return await this.entityManager
+        .createQueryBuilder(Curriculum, 'curriculums')
+        .where('curriculums.schoolId = :schoolId', {
+          schoolId: schoolMember.schoolId,
+        })
+        .leftJoinAndSelect('curriculums.grade', 'grade')
+        .leftJoinAndSelect('curriculums.subject', 'subject')
+        .select([
+          'curriculums.name',
+          'curriculums.id',
+          'grade.id',
+          'grade.name',
+          'subject.id',
+          'subject.name',
+        ])
+        .getMany();
+    }
+
+    return await this.entityManager
+      .createQueryBuilder(Curriculum, 'curriculums')
+      .where('curriculums.createdById = :createdById', {
+        createdById: user.id,
+      })
+      .leftJoinAndSelect('curriculums.grade', 'grade')
+      .leftJoinAndSelect('curriculums.subject', 'subject')
+      .select([
+        'curriculums.name',
+        'curriculums.id',
+        'grade.id',
+        'grade.name',
+        'subject.id',
+        'subject.name',
+      ])
+      .getMany();
+  }
+  async getCurriculumById(id: string, user: User) {
+    const schoolMember = await this.entityManager.findOne(SchoolMember, {
+      select: { schoolId: true },
+      where: {
+        userId: user.id,
+        role:
+          SchoolRole.ADMIN ||
+          SchoolRole.OWNER ||
+          SchoolRole.HEAD_TEACHER ||
+          SchoolRole.PRINCIPAL ||
+          SchoolRole.VICE_PRINCIPAL ||
+          SchoolRole.DIRECTOR ||
+          SchoolRole.HEAD_OF_DEPARTMENT,
+      },
+    });
+
+    if (schoolMember) {
+      return await this.entityManager
+        .createQueryBuilder(Curriculum, 'curriculums')
+        .where('curriculums.schoolId = :schoolId', {
+          schoolId: schoolMember.schoolId,
+          id,
+        })
+        .leftJoinAndSelect('curriculums.grade', 'grade')
+        .leftJoinAndSelect('curriculums.items', 'items')
+        .leftJoinAndSelect('curriculums.subject', 'subject')
+        .select([
+          'curriculums.id',
+          'curriculums.name',
+          'items',
+          'grade.id',
+          'grade.name',
+          'subject.id',
+          'subject.name',
+        ])
+        .getOne();
+    }
+
+    return await this.entityManager
+      .createQueryBuilder(Curriculum, 'curriculums')
+      .where('curriculums.createdById = :createdById', {
+        createdById: user.id,
+        id,
+      })
+      .leftJoinAndSelect('curriculums.grade', 'grade')
+      .leftJoinAndSelect('curriculums.items', 'items')
+      .leftJoinAndSelect('curriculums.subject', 'subject')
+      .select([
+        'curriculums.id',
+        'curriculums.name',
+        'items',
+        'grade.id',
+        'grade.name',
+        'subject.id',
+        'subject.name',
+      ])
+      .getOne();
   }
 
   // async findAllForUser(user: User): Promise<Curriculum[]> {

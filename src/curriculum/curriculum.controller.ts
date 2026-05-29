@@ -42,23 +42,15 @@ export class CurriculumController {
   }
 
   @Get()
-  findAll(@CurrentUser() user: User) {
+  getAllCurriculum(@CurrentUser() user: User) {
     return this.curriculumService.getAllCurriculum(user);
   }
 
-  /**
-   * GET /curriculum/:id
-   * Retrieve a single curriculum if accessible to the current user.
-   */
-  // @Get(':id')
-  // findOne(@Param('id') id: string, @CurrentUser() user: User) {
-  //   return this.curriculumService.findOne(id, user);
-  // }
+  @Get(':id')
+  getCurriculumById(@Param('id') id: string, @CurrentUser() user: User) {
+    return this.curriculumService.getCurriculumById(id, user);
+  }
 
-  /**
-   * PATCH /curriculum/:id
-   * Update a curriculum. Only the original creator can update it.
-   */
   @Patch(':id')
   update(
     @Param('id') id: string,
@@ -68,10 +60,6 @@ export class CurriculumController {
     return this.curriculumService.update(id, user, updateCurriculumDto);
   }
 
-  /**
-   * DELETE /curriculum/:id
-   * Delete a curriculum. Only the original creator can delete it.
-   */
   @Delete(':id')
   @HttpCode(HttpStatus.NO_CONTENT)
   remove(@Param('id') id: string, @CurrentUser() user: User) {
