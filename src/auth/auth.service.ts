@@ -163,7 +163,7 @@ export class AuthService {
     };
 
     if (includeSchool) {
-      authResponse.school = await this.schoolService.findSchoolByUser(user);
+      authResponse.school = await this.schoolService.findSchoolByUser(user.id);
     }
 
     return authResponse;

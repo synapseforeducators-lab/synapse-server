@@ -7,6 +7,11 @@ export class CreateBillingDto {
   @ApiProperty({ enum: BillingPlan, enumName: 'BillingPlan' })
   @IsString()
   plan: BillingPlan;
+
+  @ApiPropertyOptional()
+  @IsString()
+  @IsOptional()
+  schoolId?: string;
 }
 
 export class BillingQueryParamsDto {

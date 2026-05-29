@@ -15,6 +15,7 @@ import { SchoolMember } from 'src/schools/entities/school-member.entity';
 import { BillingTransaction } from './entities/billing_transactions.entity';
 import { SchoolSubscription } from './entities/school_subscriptions.entity';
 import { UserSubscription } from './entities/user_subscriptions.entity';
+import { SchoolModule } from 'src/schools/school.module';
 
 @Module({
   imports: [
@@ -24,6 +25,8 @@ import { UserSubscription } from './entities/user_subscriptions.entity';
       SchoolSubscription,
       SchoolMember,
     ]),
+
+    SchoolModule,
   ],
 
   controllers: [BillingController],

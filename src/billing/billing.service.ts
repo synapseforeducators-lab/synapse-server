@@ -1,3 +1,4 @@
+import { SchoolsService } from './../schools/school.service';
 import {
   Injectable,
   BadRequestException,
@@ -20,6 +21,8 @@ import {
   BillingQueryParamsDto,
   CreateBillingDto,
 } from './dto/create-billing.dto';
+import { School } from 'src/schools/entities/school.entity';
+import { SchoolSubscription } from './entities/school_subscriptions.entity';
 
 @Injectable()
 export class BillingService {
@@ -27,12 +30,17 @@ export class BillingService {
     @InjectRepository(BillingTransaction)
     private readonly transactionRepo: Repository<BillingTransaction>,
     @InjectRepository(UserSubscription)
-    private readonly subscriptionRepo: Repository<UserSubscription>,
+    private readonly userSubscriptionRepo: Repository<UserSubscription>,
+    @InjectRepository(SchoolSubscription)
+    private readonly schoolSubscriptionRepo: Repository<SchoolSubscription>,
     private readonly paystack: PaystackService,
+    private readonly schoolsService: SchoolsService,
   ) {}
 
   async initializeCheckout(user: User, createBillingDto: CreateBillingDto) {
-    const subscription = await this.getUserCurrentSubscription(user.id);
+    const subscription = createBillingDto.plan.includes('SCHOOL')
+      ? await this.getSchoolCurrentSubscription(user.id)
+      : await this.getUserCurrentSubscription(user.id);
 
     if (subscription && subscription.plan === createBillingDto.plan) {
       throw new BadRequestException('Existing active subscription');
@@ -68,6 +76,7 @@ export class BillingService {
       email: user.email,
       plan: createBillingDto.plan,
       status: BillingStatus.PENDING,
+      schoolId: createBillingDto.schoolId,
     });
 
     console.log('transaction initialized:', transaction);
@@ -123,16 +132,42 @@ export class BillingService {
   }
 
   async activateSubscription(transaction: BillingTransaction) {
-    let subscription = await this.subscriptionRepo.findOne({
-      where: {
-        userId: transaction.userId,
-      },
-    });
-
-    if (!subscription) {
-      subscription = this.subscriptionRepo.create({
-        userId: transaction.userId,
+    let subscription;
+    if (
+      transaction.plan === 'SCHOOL_MONTHLY' ||
+      transaction.plan === 'SCHOOL_YEARLY'
+    ) {
+      subscription = await this.schoolSubscriptionRepo.findOne({
+        where: {
+          schoolId: transaction.schoolId,
+        },
       });
+
+      if (!subscription) {
+        subscription = this.schoolSubscriptionRepo.create({
+          schoolId: transaction.schoolId,
+          school: await this.schoolsService.findSchoolByUser(
+            transaction.userId,
+          ),
+        });
+      }
+    }
+
+    if (
+      transaction.plan === 'STANDARD_MONTHLY' ||
+      transaction.plan === 'STANDARD_YEARLY'
+    ) {
+      subscription = await this.userSubscriptionRepo.findOne({
+        where: {
+          userId: transaction.userId,
+        },
+      });
+
+      if (!subscription) {
+        subscription = this.userSubscriptionRepo.create({
+          userId: transaction.userId,
+        });
+      }
     }
 
     const duration = transaction.plan.includes('YEARLY') ? 1 : 1;
@@ -153,11 +188,15 @@ export class BillingService {
 
     subscription.currentPeriodEnd = currentPeriodEnd;
 
-    await this.subscriptionRepo.save(subscription);
+    if (transaction.plan.includes('SCHOOL')) {
+      return await this.schoolSubscriptionRepo.save(subscription);
+    }
+
+    return await this.userSubscriptionRepo.save(subscription);
   }
 
   async cancelSubscription(subscriptionId: string) {
-    const subscription = await this.subscriptionRepo.findOne({
+    const subscription = await this.userSubscriptionRepo.findOne({
       where: { id: subscriptionId },
     });
 
@@ -167,7 +206,7 @@ export class BillingService {
 
     subscription.cancelAtPeriodEnd = true;
 
-    return this.subscriptionRepo.save(subscription);
+    return this.userSubscriptionRepo.save(subscription);
   }
 
   async getSubscriptionList() {
@@ -177,7 +216,7 @@ export class BillingService {
     return this.paystack.getSubscriptionById(id);
   }
   async getUserCurrentSubscription(userId: string) {
-    const subscription = await this.subscriptionRepo.findOne({
+    const subscription = await this.userSubscriptionRepo.findOne({
       where: { userId, status: SubscriptionStatus.ACTIVE },
     });
 
@@ -194,7 +233,37 @@ export class BillingService {
 
     if (daysDifference < 1) {
       subscription.status = SubscriptionStatus.EXPIRED;
-      return await this.subscriptionRepo.save(subscription);
+      return await this.userSubscriptionRepo.save(subscription);
+    }
+
+    return subscription;
+  }
+  async getSchoolCurrentSubscription(userId: string) {
+    const school = await this.schoolsService.findSchoolByUser(userId);
+
+    if (!school) {
+      return null;
+    }
+
+    const subscription = await this.schoolSubscriptionRepo.findOne({
+      where: { schoolId: school.id, status: SubscriptionStatus.ACTIVE, },
+
+    });
+
+    if (!subscription) {
+      return null;
+    }
+
+    const oneDay = 24 * 60 * 60 * 1000;
+
+    const daysDifference =
+      (new Date(subscription.currentPeriodEnd).getTime() -
+        new Date(subscription.currentPeriodStart).getTime()) /
+      oneDay;
+
+    if (daysDifference < 1) {
+      subscription.status = SubscriptionStatus.EXPIRED;
+      return await this.schoolSubscriptionRepo.save(subscription);
     }
 
     return subscription;

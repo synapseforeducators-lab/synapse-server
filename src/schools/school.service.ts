@@ -84,9 +84,9 @@ export class SchoolsService {
     return customResponse('School profile details updated successfully');
   }
 
-  async findSchoolByUser(user: User) {
+  async findSchoolByUser(userId: string) {
     const schoolMember = await this.schoolMembersRepository.findOne({
-      userId: user.id,
+      userId: userId,
     });
     if (!schoolMember) {
       return null;

@@ -50,7 +50,6 @@ export class AccessResolverService {
     const userSubscription = await this.userSubRepo.findOne({
       where: {
         userId,
-
         status: SubscriptionStatus.ACTIVE,
       },
     });
