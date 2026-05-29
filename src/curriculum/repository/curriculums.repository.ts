@@ -17,6 +17,7 @@ import { School, SchoolRole } from 'src/schools/entities/school.entity';
 import { SchoolMember } from 'src/schools/entities/school-member.entity';
 import { Grade } from 'src/grades/entities/grade.entity';
 import { Subject } from 'src/subject/entities/subject.entity';
+import { customResponse } from 'src/common/util';
 
 @Injectable()
 export class CurriculumRepository extends AbstractRepository<Curriculum> {
@@ -183,9 +184,12 @@ export class CurriculumRepository extends AbstractRepository<Curriculum> {
     if (schoolMember) {
       return await this.entityManager
         .createQueryBuilder(Curriculum, 'curriculums')
-        .where('curriculums.schoolId = :schoolId', {
+        .where('curriculums.schoolId = :schoolId AND curriculums.id = :id', {
           schoolId: schoolMember.schoolId,
           id,
+        })
+        .andWhere('curriculums.is_deleted = :is_deleted', {
+          is_deleted: false,
         })
         .leftJoinAndSelect('curriculums.grade', 'grade')
         .leftJoinAndSelect('curriculums.items', 'items')
@@ -204,13 +208,20 @@ export class CurriculumRepository extends AbstractRepository<Curriculum> {
 
     return await this.entityManager
       .createQueryBuilder(Curriculum, 'curriculums')
-      .where('curriculums.createdById = :createdById', {
-        createdById: user.id,
-        id,
+      .where(
+        'curriculums.createdById = :createdById AND curriculums.id = :id',
+        {
+          createdById: user.id,
+          id,
+        },
+      )
+      .andWhere('curriculums.is_deleted = :is_deleted', {
+        is_deleted: false,
       })
       .leftJoinAndSelect('curriculums.grade', 'grade')
       .leftJoinAndSelect('curriculums.items', 'items')
       .leftJoinAndSelect('curriculums.subject', 'subject')
+
       .select([
         'curriculums.id',
         'curriculums.name',
@@ -329,11 +340,14 @@ export class CurriculumRepository extends AbstractRepository<Curriculum> {
   /**
    * Delete a curriculum. Only the original creator may delete it.
    */
-  async deleteCurriculum(id: string, user: User): Promise<void> {
+  async deleteCurriculum(id: string, user: User) {
     try {
-      const curriculum = await this.repository.findOne({
-        where: { id, createdBy: { id: user.id } },
-      });
+      const curriculum = await this.repository.update(
+        { id, createdBy: { id: user.id } },
+        {
+          is_deleted: true,
+        },
+      );
 
       if (!curriculum) {
         throw new NotFoundException(
@@ -341,7 +355,7 @@ export class CurriculumRepository extends AbstractRepository<Curriculum> {
         );
       }
 
-      await this.repository.remove(curriculum);
+      customResponse('Curriculum  deleted successfully');
     } catch (error) {
       if (error instanceof NotFoundException) throw error;
       this.logger.error('Error deleting curriculum', error);

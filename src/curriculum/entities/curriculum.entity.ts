@@ -44,6 +44,9 @@ export class Curriculum extends AbstractEntity<Curriculum> {
   @Column()
   createdById: string;
 
+  @Column({ type: 'boolean', default: false })
+  is_deleted: boolean;
+
   @OneToMany(() => CurriculumItem, (item) => item.curriculum, {
     cascade: true,
   })

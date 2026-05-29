@@ -40,7 +40,7 @@ export class CurriculumService {
     return currRes;
   }
 
-  async update(
+  async updateCurriculumById(
     id: string,
     user: User,
     updateCurriculumDto: UpdateCurriculumDto,
@@ -52,7 +52,7 @@ export class CurriculumService {
     );
   }
 
-  async remove(id: string, user: User): Promise<void> {
+  async remove(id: string, user: User) {
     return this.curriculumRepository.deleteCurriculum(id, user);
   }
 }
