@@ -57,7 +57,11 @@ export class CurriculumController {
     @CurrentUser() user: User,
     @Body() updateCurriculumDto: UpdateCurriculumDto,
   ) {
-    return this.curriculumService.updateCurriculumById(id, user, updateCurriculumDto);
+    return this.curriculumService.updateCurriculumById(
+      id,
+      user,
+      updateCurriculumDto,
+    );
   }
 
   @Delete(':id')
