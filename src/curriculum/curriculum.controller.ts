@@ -65,7 +65,6 @@ export class CurriculumController {
   }
 
   @Delete(':id')
-  @HttpCode(HttpStatus.NO_CONTENT)
   remove(@Param('id') id: string, @CurrentUser() user: User) {
     return this.curriculumService.remove(id, user);
   }

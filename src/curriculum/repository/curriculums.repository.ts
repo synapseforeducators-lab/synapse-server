@@ -135,6 +135,9 @@ export class CurriculumRepository extends AbstractRepository<Curriculum> {
         .where('curriculums.schoolId = :schoolId', {
           schoolId: schoolMember.schoolId,
         })
+        .andWhere('curriculums.is_deleted = :is_deleted', {
+          is_deleted: false,
+        })
         .leftJoinAndSelect('curriculums.grade', 'grade')
         .leftJoinAndSelect('curriculums.subject', 'subject')
         .select([
@@ -152,6 +155,9 @@ export class CurriculumRepository extends AbstractRepository<Curriculum> {
       .createQueryBuilder(Curriculum, 'curriculums')
       .where('curriculums.createdById = :createdById', {
         createdById: user.id,
+      })
+      .andWhere('curriculums.is_deleted = :is_deleted', {
+        is_deleted: false,
       })
       .leftJoinAndSelect('curriculums.grade', 'grade')
       .leftJoinAndSelect('curriculums.subject', 'subject')
@@ -209,7 +215,7 @@ export class CurriculumRepository extends AbstractRepository<Curriculum> {
     return await this.entityManager
       .createQueryBuilder(Curriculum, 'curriculums')
       .where(
-        'curriculums.createdById = :createdById AND curriculums.id = :id',
+        'curriculums.createdById = :createdById AND curriculums.id = :id ',
         {
           createdById: user.id,
           id,
@@ -355,7 +361,7 @@ export class CurriculumRepository extends AbstractRepository<Curriculum> {
         );
       }
 
-      customResponse('Curriculum  deleted successfully');
+      return customResponse('Curriculum  deleted successfully');
     } catch (error) {
       if (error instanceof NotFoundException) throw error;
       this.logger.error('Error deleting curriculum', error);
