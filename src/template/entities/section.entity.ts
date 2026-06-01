@@ -7,6 +7,10 @@ export enum SectionTypeEnum {
   RICH_TEXT = 'rich_text',
   LIST = 'list',
   IMAGE = 'image',
+  NUMBER = 'number',
+  DATE = 'date',
+  SELECT = 'select',
+  TEXTAREA = 'textarea',
 }
 
 @Entity()
