@@ -52,7 +52,6 @@ export class TemplateController {
     return customResponse('Template created successfully');
   }
 
-
   @Get()
   findAll(@CurrentUser() user: User) {
     return this.templateService.getAllTemplate(user);
@@ -80,7 +79,6 @@ export class TemplateController {
     return this.templateService.update(id, user, updateTemplateDto);
   }
 
-  
   @Delete(':id')
   @HttpCode(HttpStatus.NO_CONTENT)
   remove(@Param('id') id: string, @CurrentUser() user: User) {

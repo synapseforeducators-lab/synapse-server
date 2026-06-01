@@ -204,7 +204,7 @@ export class TemplatesRepository extends AbstractRepository<Template> {
       ])
       .getOne();
   }
-  async  updateTemplate(
+  async updateTemplate(
     id: string,
     user: User,
     updateTemplateDto: UpdateTemplateDto,
