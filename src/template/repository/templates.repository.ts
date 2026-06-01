@@ -252,17 +252,18 @@ export class TemplatesRepository extends AbstractRepository<Template> {
    */
   async deleteTemplate(id: string, user: User): Promise<void> {
     try {
-      const template = await this.repository.findOne({
-        where: { id, createdBy: { id: user.id } },
-      });
+      const template = await this.repository.update(
+        { id, createdBy: { id: user.id } },
+        {
+          is_deleted: true,
+        },
+      );
 
       if (!template) {
         throw new NotFoundException(
           `Template ${id} not found or you do not have permission to delete it`,
         );
       }
-
-      await this.repository.remove(template);
     } catch (error) {
       if (error instanceof NotFoundException) throw error;
       this.logger.error('Error deleting template', error);
