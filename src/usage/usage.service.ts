@@ -1,4 +1,3 @@
-import { BillingPlan } from './../billing/enum/billing-plan.enum';
 import { Injectable, ForbiddenException } from '@nestjs/common';
 
 import { UsageRepository } from './repositories/usage.repository';
@@ -54,7 +53,7 @@ export class UsageService {
 
     const limit = limits[type];
 
-    let usagePeriod = access.plan.includes('YEAR')
+    const usagePeriod = access.plan.includes('YEAR')
       ? UsagePeriod.YEARLY
       : UsagePeriod.MONTHLY;
 
@@ -95,7 +94,7 @@ export class UsageService {
       throw new ForbiddenException('Usage limit exceeded');
     }
 
-    let usagePeriod = access.plan.includes('YEAR')
+    const usagePeriod = access.plan.includes('YEAR')
       ? UsagePeriod.YEARLY
       : UsagePeriod.MONTHLY;
 
@@ -136,7 +135,7 @@ export class UsageService {
       throw new ForbiddenException('Usage limit exceeded');
     }
 
-    let usagePeriod = access.plan.includes('YEAR')
+    const usagePeriod = access.plan.includes('YEAR')
       ? UsagePeriod.YEARLY
       : UsagePeriod.MONTHLY;
 
