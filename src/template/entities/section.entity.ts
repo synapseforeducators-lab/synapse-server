@@ -1,4 +1,4 @@
-import { Column, Entity, ManyToOne } from 'typeorm';
+import { Column, Entity, JoinColumn, ManyToOne } from 'typeorm';
 import { Template } from './template.entity';
 import { AbstractEntity } from 'src/common';
 
@@ -29,6 +29,11 @@ export class TemplateSection extends AbstractEntity<TemplateSection> {
 
   @ManyToOne(() => Template, (template) => template.sections, {
     onDelete: 'CASCADE',
+    nullable: true,
   })
+  @JoinColumn({ name: 'templateId' })
   template: Template;
+
+  @Column({ nullable: true })
+  templateId?: string;
 }

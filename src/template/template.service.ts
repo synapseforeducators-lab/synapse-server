@@ -21,18 +21,7 @@ export class TemplateService {
   }
 
   async getAllTemplate(user: User) {
-    const templateRes = await this.templatesRepository
-      .qb('templates')
-      .where('templates.createdById = :createdById', { createdById: user.id })
-      .leftJoinAndSelect('templates.sections', 'sections')
-      .select([
-        'templates.name',
-        'sections.label',
-        'sections.type',
-        'sections.required',
-        'sections.order',
-      ])
-      .getMany();
+    const templateRes = this.templatesRepository.getAllTemplate(user);
 
     if (!templateRes) {
       throw new BadRequestException('unable to get template');
@@ -41,9 +30,9 @@ export class TemplateService {
     return templateRes;
   }
 
-  // async findOne(id: string, user: User): Promise<Template> {
-  //   return this.templatesRepository.findOneForUser(id, user);
-  // }
+  async findOne(id: string, user: User): Promise<Template> {
+    return this.templatesRepository.getTemplateById(id, user);
+  }
 
   async update(
     id: string,

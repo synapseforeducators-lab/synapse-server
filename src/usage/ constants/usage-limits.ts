@@ -6,6 +6,7 @@ export const USAGE_LIMITS = {
     [UsageType.SCHEME]: 2,
     [UsageType.NOTE]: 2,
     [UsageType.CURRICULUM]: 2,
+    [UsageType.TEMPLATE]: 2,
     [UsageType.AI_NOTE_GENERATION]: 0,
   },
 
@@ -13,6 +14,7 @@ export const USAGE_LIMITS = {
     [UsageType.SCHEME]: Infinity,
     [UsageType.NOTE]: Infinity,
     [UsageType.CURRICULUM]: Infinity,
+    [UsageType.TEMPLATE]: 5,
     [UsageType.AI_NOTE_GENERATION]: 100,
   },
 
@@ -20,6 +22,7 @@ export const USAGE_LIMITS = {
     [UsageType.SCHEME]: Infinity,
     [UsageType.NOTE]: Infinity,
     [UsageType.CURRICULUM]: Infinity,
+    [UsageType.TEMPLATE]: 10,
     [UsageType.AI_NOTE_GENERATION]: 1500,
   },
 
@@ -27,6 +30,7 @@ export const USAGE_LIMITS = {
     [UsageType.SCHEME]: Infinity,
     [UsageType.NOTE]: Infinity,
     [UsageType.CURRICULUM]: Infinity,
+    [UsageType.TEMPLATE]: 10,
     [UsageType.AI_NOTE_GENERATION]: Infinity,
   },
 
@@ -34,6 +38,7 @@ export const USAGE_LIMITS = {
     [UsageType.SCHEME]: Infinity,
     [UsageType.NOTE]: Infinity,
     [UsageType.CURRICULUM]: Infinity,
+    [UsageType.TEMPLATE]: 100,
     [UsageType.AI_NOTE_GENERATION]: Infinity,
   },
 };

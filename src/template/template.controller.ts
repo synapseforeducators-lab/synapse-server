@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   Body,
   Controller,
   Delete,
@@ -9,6 +10,7 @@ import {
   Patch,
   Post,
   UseGuards,
+  UseInterceptors,
 } from '@nestjs/common';
 import { CreateTemplateDto } from './dto/create-template.dto';
 import { UpdateTemplateDto } from './dto/update-template.dto';
@@ -17,6 +19,11 @@ import { JwtAuthGuard } from 'src/auth/guards/jwt-auth/jwt-auth.guard';
 import { TemplateService } from './template.service';
 import { User } from 'src/user/entities/user.entity';
 import { CurrentUser } from 'src/common/decorators';
+import { UsageLimit } from 'src/usage/decorators/usage-limit.decorator';
+import { UsageType } from 'src/usage/enums/usage-type.enum';
+import { UsageLimitGuard } from 'src/usage/guards/usage-limit.guard';
+import { UsageInterceptor } from 'src/usage/interceptors/usage.interceptor';
+import { customResponse } from 'src/common/util';
 
 @ApiTags('Templates')
 @ApiBearerAuth()
@@ -25,25 +32,27 @@ import { CurrentUser } from 'src/common/decorators';
 export class TemplateController {
   constructor(private readonly templateService: TemplateService) {}
 
-  /**
-   * POST /templates
-   * Create a new template.  The template is scoped to the user's school
-   * automatically if they belong to one.
-   */
   @Post()
+  @UsageLimit(UsageType.TEMPLATE)
+  @UseGuards(UsageLimitGuard)
+  @UseInterceptors(UsageInterceptor)
   async create(
     @CurrentUser() user: User,
     @Body() createTemplateDto: CreateTemplateDto,
   ) {
-    return await this.templateService.createTemplate(user, createTemplateDto);
+    const template = await this.templateService.createTemplate(
+      user,
+      createTemplateDto,
+    );
+
+    if (!template) {
+      throw new BadRequestException('unable to create template');
+    }
+
+    return customResponse('Template created successfully');
   }
 
-  /**
-   * GET /templates
-   * List all templates visible to the current user:
-   *  - School templates (if the user belongs to a school)
-   *  - Personal templates created by this user without a school
-   */
+
   @Get()
   findAll(@CurrentUser() user: User) {
     return this.templateService.getAllTemplate(user);
@@ -53,10 +62,10 @@ export class TemplateController {
    * GET /templates/:id
    * Retrieve a single template if it is accessible to the current user.
    */
-  // @Get(':id')
-  // findOne(@Param('id') id: string, @CurrentUser() user: User) {
-  //   return this.templateService.findOne(id, user);
-  // }
+  @Get(':id')
+  findOne(@Param('id') id: string, @CurrentUser() user: User) {
+    return this.templateService.findOne(id, user);
+  }
 
   /**
    * PATCH /templates/:id
@@ -71,10 +80,7 @@ export class TemplateController {
     return this.templateService.update(id, user, updateTemplateDto);
   }
 
-  /**
-   * DELETE /templates/:id
-   * Delete a template.  Only the original creator can delete it.
-   */
+  
   @Delete(':id')
   @HttpCode(HttpStatus.NO_CONTENT)
   remove(@Param('id') id: string, @CurrentUser() user: User) {

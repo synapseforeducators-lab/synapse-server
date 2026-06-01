@@ -1,15 +1,16 @@
+import { BillingPlan } from './../billing/enum/billing-plan.enum';
 import { Injectable, ForbiddenException } from '@nestjs/common';
 
 import { UsageRepository } from './repositories/usage.repository';
 import { AccessResolverService } from 'src/billing/access/access-resolver.service';
-import { UsageType } from './enums/usage-type.enum';
+import { UsagePeriod, UsageType } from './enums/usage-type.enum';
 import { USAGE_LIMITS } from './ constants/usage-limits';
+import { UsageTracking } from './entities/usage-tracking.entity';
 
 @Injectable()
 export class UsageService {
   constructor(
     private readonly usageRepo: UsageRepository,
-
     private readonly accessResolver: AccessResolverService,
   ) {}
 
@@ -20,23 +21,28 @@ export class UsageService {
     const month = String(now.getMonth() + 1).padStart(2, '0');
 
     const result = `${year}-${month}`;
-    return result;
+    return { result, year, month };
   }
 
-  async getUsage(userId: string, type: UsageType) {
+  async getUsage(userId: string, type: UsageType, usage_period: UsagePeriod) {
     const usage = await this.usageRepo.findOne({
-      where: {
-        userId,
-        type,
-        period: this.currentPeriod(),
-      },
+      userId,
+      type,
+      ...(usage_period === UsagePeriod.MONTHLY && {
+        month: +this.currentPeriod().month,
+        year: +this.currentPeriod().year,
+      }),
     });
 
     return usage || null;
   }
 
-  async getUsageCount(userId: string, type: UsageType) {
-    const usage = await this.getUsage(userId, type);
+  async getUsageCount(
+    userId: string,
+    type: UsageType,
+    usage_period: UsagePeriod,
+  ) {
+    const usage = await this.getUsage(userId, type, usage_period);
 
     return usage?.count || 0;
   }
@@ -48,7 +54,20 @@ export class UsageService {
 
     const limit = limits[type];
 
-    const current = await this.getUsageCount(userId, type);
+    let usagePeriod = access.plan.includes('YEAR')
+      ? UsagePeriod.YEARLY
+      : UsagePeriod.MONTHLY;
+
+    const current = await this.getUsageCount(userId, type, usagePeriod);
+
+    console.log({
+      access,
+      usagePeriod,
+      current,
+      limit,
+      limits,
+      a: limits[UsageType[type]],
+    });
 
     if (limit === Infinity) {
       return {
@@ -76,35 +95,62 @@ export class UsageService {
       throw new ForbiddenException('Usage limit exceeded');
     }
 
+    let usagePeriod = access.plan.includes('YEAR')
+      ? UsagePeriod.YEARLY
+      : UsagePeriod.MONTHLY;
+
     let usage = await this.usageRepo.findOne({
-      where: {
-        userId,
-        type,
-        period: this.currentPeriod(),
-      },
+      userId,
+      type,
+      usage_period: usagePeriod,
+      ...(usagePeriod === UsagePeriod.MONTHLY && {
+        month: +this.currentPeriod().month,
+        year: +this.currentPeriod().year,
+      }),
+      ...(usagePeriod === UsagePeriod.YEARLY && {
+        year: +this.currentPeriod().year,
+      }),
     });
 
     if (!usage) {
-      usage = this.usageRepo.create({
+      const newUsage = new UsageTracking({
         userId,
         type,
         count: 0,
-        period: this.currentPeriod(),
+        usage_period: usagePeriod,
+        month: +this.currentPeriod().month,
+        year: +this.currentPeriod().year,
       });
+      usage = await this.usageRepo.create(newUsage);
     }
 
     usage.count += 1;
 
-    return this.usageRepo.save(usage);
+    return this.usageRepo.create(usage);
   }
 
   async decrement(userId: string, type: UsageType) {
+    const access = await this.canUse(userId, type);
+
+    if (!access.allowed) {
+      throw new ForbiddenException('Usage limit exceeded');
+    }
+
+    let usagePeriod = access.plan.includes('YEAR')
+      ? UsagePeriod.YEARLY
+      : UsagePeriod.MONTHLY;
+
     const usage = await this.usageRepo.findOne({
-      where: {
-        userId,
-        type,
-        period: this.currentPeriod(),
-      },
+      userId,
+      type,
+      usage_period: usagePeriod,
+      ...(usagePeriod === UsagePeriod.MONTHLY && {
+        month: +this.currentPeriod().month,
+        year: +this.currentPeriod().year,
+      }),
+      ...(usagePeriod === UsagePeriod.YEARLY && {
+        year: +this.currentPeriod().year,
+      }),
     });
 
     if (!usage) {
@@ -113,10 +159,12 @@ export class UsageService {
 
     usage.count = Math.max(usage.count - 1, 0);
 
-    return this.usageRepo.save(usage);
+    return this.usageRepo.create(usage);
   }
 
-  async resetMonthlyUsage() {
-    return true;
+  async resetMonthlyUsage(userId: string) {
+    const period = this.currentPeriod();
+
+    return this.usageRepo.resetUsage(userId, +period.month, +period.year);
   }
 }

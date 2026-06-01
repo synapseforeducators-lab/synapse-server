@@ -4,10 +4,13 @@ import { TemplateSection } from './section.entity';
 import { AbstractEntity } from 'src/common';
 import { School } from 'src/schools/entities/school.entity';
 
-@Entity()
+@Entity('templates')
 export class Template extends AbstractEntity<Template> {
   @Column({ type: 'text', nullable: true })
   name: string;
+
+  @Column({ type: 'text', nullable: true })
+  school_name: string;
 
   @ManyToOne(() => School, {
     nullable: true,
@@ -32,4 +35,7 @@ export class Template extends AbstractEntity<Template> {
     eager: true,
   })
   sections: TemplateSection[];
+
+  @Column({ type: 'boolean', default: false })
+  is_deleted: boolean;
 }

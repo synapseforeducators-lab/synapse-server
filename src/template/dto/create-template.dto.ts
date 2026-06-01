@@ -18,7 +18,7 @@ export class CreateTemplateSectionDto {
   @IsNotEmpty()
   label: string;
 
-  @ApiProperty()
+  @ApiProperty({ enum: SectionTypeEnum, enumName: 'type' })
   @IsEnum(SectionTypeEnum)
   type: SectionTypeEnum;
 
@@ -39,6 +39,11 @@ export class CreateTemplateDto {
   @IsString()
   @IsNotEmpty()
   name: string;
+
+  @ApiPropertyOptional()
+  @IsString()
+  @IsOptional()
+  school_name: string;
 
   @ApiProperty({ type: () => CreateTemplateSectionDto, isArray: true })
   @ValidateNested({ each: true })

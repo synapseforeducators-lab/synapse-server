@@ -14,7 +14,7 @@ import { UpdateTemplateDto } from '../dto/update-template.dto';
 import { TemplateSection } from '../entities/section.entity';
 import { User } from 'src/user/entities/user.entity';
 import { SchoolMember } from 'src/schools/entities/school-member.entity';
-import { School } from 'src/schools/entities/school.entity';
+import { School, SchoolRole } from 'src/schools/entities/school.entity';
 
 @Injectable()
 export class TemplatesRepository extends AbstractRepository<Template> {
@@ -40,7 +40,7 @@ export class TemplatesRepository extends AbstractRepository<Template> {
     try {
       const { sections, ...templateData } = createTemplateDto;
 
-      let schoolExist: School;
+      let schoolExist: School | null = null;
       let template: Template;
       const templateSections = sections.map((sectionDto, index) =>
         this.entityManager.create(TemplateSection, {
@@ -48,8 +48,6 @@ export class TemplatesRepository extends AbstractRepository<Template> {
           order: sectionDto.order ?? index,
         }),
       );
-
-      console.log(templateSections);
 
       await this.entityManager.transaction(
         async (transactionalEntityManager: EntityManager) => {
@@ -60,37 +58,26 @@ export class TemplatesRepository extends AbstractRepository<Template> {
             },
           );
 
-          if (!schoolMemberExist) {
-            schoolExist = null;
-          }
-
           if (schoolMemberExist) {
             schoolExist = await transactionalEntityManager.findOne(School, {
               where: { id: schoolMemberExist.schoolId },
             });
           }
 
-          template = this.repository.create({
-            school: schoolExist ?? null,
-            schoolId: schoolExist.id ?? null,
+          const newTemplate = new Template({
+            ...templateData,
+            school: schoolExist,
+            schoolId: schoolExist?.id ?? null,
             createdBy: user,
             sections: templateSections,
-            ...templateData,
+            school_name: schoolExist
+              ? schoolExist.school_name
+              : templateData.school_name,
           });
 
-          template = await this.repository.save(template);
+          template = await transactionalEntityManager.save(newTemplate);
         },
       );
-
-      console.log(template);
-
-      delete template.createdBy;
-      delete template.createdById;
-      delete template.created_at;
-      delete template.updated_at;
-      delete template.school;
-      delete template.schoolId;
-      delete template.id;
 
       return template;
     } catch (error) {
@@ -99,77 +86,125 @@ export class TemplatesRepository extends AbstractRepository<Template> {
     }
   }
 
-  /**
-   * Find all templates visible to the user.
-   *
-   * Rules:
-   *  - If the user belongs to a school  → return templates created by anyone
-   *    in the same school  + templates created personally by this user that
-   *    have no school association (personal drafts).
-   *  - If the user has no school        → return only their own templates.
-   */
-  // async findAllForUser(user: User): Promise<Template[]> {
-  //   try {
-  //     if (user.school) {
-  //       return await this.repository.find({
-  //         where: [
-  //           { school: { id: user.school.id } },
-  //           { createdBy: { id: user.id }, school: IsNull() },
-  //         ],
-  //         relations: ['createdBy', 'school'],
-  //         order: { created_at: 'DESC' },
-  //       });
-  //     }
+  async getAllTemplate(user: User) {
+    const schoolMember = await this.entityManager.findOne(SchoolMember, {
+      select: { schoolId: true },
+      where: {
+        userId: user.id,
+        role:
+          SchoolRole.ADMIN ||
+          SchoolRole.OWNER ||
+          SchoolRole.HEAD_TEACHER ||
+          SchoolRole.PRINCIPAL ||
+          SchoolRole.VICE_PRINCIPAL ||
+          SchoolRole.DIRECTOR ||
+          SchoolRole.HEAD_OF_DEPARTMENT,
+      },
+    });
 
-  //     return await this.repository.find({
-  //       where: { createdBy: { id: user.id } },
-  //       relations: ['createdBy', 'school'],
-  //       order: { created_at: 'DESC' },
-  //     });
-  //   } catch (error) {
-  //     this.logger.error('Error fetching templates', error);
-  //     throw new BadRequestException('Error fetching templates');
-  //   }
-  // }
+    if (schoolMember) {
+      return await this.entityManager
+        .createQueryBuilder(Template, 'templates')
+        .where('templates.createdById = :createdById', { createdById: user.id })
+        .where('curriculums.schoolId = :schoolId', {
+          schoolId: schoolMember.schoolId,
+        })
+        .andWhere('templates.is_deleted = :is_deleted', {
+          is_deleted: false,
+        })
+        .loadRelationCountAndMap(
+          'templates.sectionsCount',
+          'templates.sections',
+        )
+        .select(['templates.id', 'templates.name', 'templates.school_name'])
+        .getMany();
+    }
 
-  /**
-   * Find a single template by id, provided it is visible to the user.
-   */
-  // async findOneForUser(id: string, user: User): Promise<Template> {
-  //   try {
-  //     let template: Template | null = null;
+    return await this.entityManager
+      .createQueryBuilder(Template, 'templates')
+      .where('templates.createdById = :createdById', { createdById: user.id })
+      .andWhere('templates.is_deleted = :is_deleted', {
+        is_deleted: false,
+      })
+      // .leftJoinAndSelect('templates.sections', 'sections')
+      .loadRelationCountAndMap('templates.sectionsCount', 'templates.sections')
+      .select([
+        'templates.id',
+        'templates.name',
+        'templates.school_name',
+        // 'sections.label',
+        // 'sections.type',
+        // 'sections.required',
+        // 'sections.order',
+      ])
+      .getMany();
+  }
+  async getTemplateById(id: string, user: User) {
+    const schoolMember = await this.entityManager.findOne(SchoolMember, {
+      select: { schoolId: true },
+      where: {
+        userId: user.id,
+        role:
+          SchoolRole.ADMIN ||
+          SchoolRole.OWNER ||
+          SchoolRole.HEAD_TEACHER ||
+          SchoolRole.PRINCIPAL ||
+          SchoolRole.VICE_PRINCIPAL ||
+          SchoolRole.DIRECTOR ||
+          SchoolRole.HEAD_OF_DEPARTMENT,
+      },
+    });
 
-  //     if (user.school) {
-  //       template = await this.repository.findOne({
-  //         where: [
-  //           { id, school: { id: user.school.id } },
-  //           { id, createdBy: { id: user.id }, school: IsNull() },
-  //         ],
-  //         relations: ['createdBy', 'school'],
-  //       });
-  //     } else {
-  //       template = await this.repository.findOne({
-  //         where: { id, createdBy: { id: user.id } },
-  //         relations: ['createdBy', 'school'],
-  //       });
-  //     }
+    if (schoolMember) {
+      return await this.entityManager
+        .createQueryBuilder(Template, 'templates')
+        .where('templates.schoolId = :schoolId AND templates.id = :id', {
+          schoolId: schoolMember.schoolId,
+          id,
+        })
+        .andWhere('templates.is_deleted = :is_deleted', {
+          is_deleted: false,
+        })
+        .leftJoinAndSelect('templates.sections', 'sections')
+        .loadRelationCountAndMap(
+          'templates.sectionsCount',
+          'templates.sections',
+        )
+        .select([
+          'templates.id',
+          'templates.name',
+          'templates.school_name',
+          'sections.label',
+          'sections.type',
+          'sections.required',
+          'sections.order',
+        ])
+        .getOne();
+    }
 
-  //     if (!template) {
-  //       throw new NotFoundException(`Template ${id} not found`);
-  //     }
-
-  //     return template;
-  //   } catch (error) {
-  //     if (error instanceof NotFoundException) throw error;
-  //     this.logger.error('Error fetching template', error);
-  //     throw new BadRequestException('Error fetching template');
-  //   }
-  // }
-
-  /**
-   * Update a template.  Only the original creator may update it.
-   */
-  async updateTemplate(
+    return await this.entityManager
+      .createQueryBuilder(Template, 'templates')
+      .where('templates.createdById = :createdById AND templates.id = :id ', {
+        createdById: user.id,
+        id,
+      })
+      .andWhere('templates.is_deleted = :is_deleted', {
+        is_deleted: false,
+      })
+      .leftJoinAndSelect('templates.sections', 'sections')
+      .loadRelationCountAndMap('templates.sectionsCount', 'templates.sections')
+      .select([
+        'templates.id',
+        'templates.name',
+        'templates.school_name',
+        'sections.label',
+        'sections.type',
+        'sections.required',
+        'sections.order',
+      ])
+      .getOne();
+  }
+  async  updateTemplate(
     id: string,
     user: User,
     updateTemplateDto: UpdateTemplateDto,

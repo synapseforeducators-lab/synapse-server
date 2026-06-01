@@ -5,3 +5,8 @@ export enum UsageType {
   TEMPLATE = 'TEMPLATE',
   AI_NOTE_GENERATION = 'AI_NOTE_GENERATION',
 }
+
+export enum UsagePeriod {
+  YEARLY = 'YEARLY',
+  MONTHLY = 'MONTHLY',
+}
