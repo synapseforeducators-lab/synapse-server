@@ -264,7 +264,7 @@ export class SchemeRepository extends AbstractRepository<SchemeOfWork> {
       }
 
       const { items, ...schemeOfWorkData } = updateSchemeDto;
- 
+
       if (items) {
         await this.entityManager.delete(SchemeOfWork, {
           id: scheme.id,
