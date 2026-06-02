@@ -21,7 +21,11 @@ import { UsageLimitGuard } from 'src/usage/guards/usage-limit.guard';
 import { UsageInterceptor } from 'src/usage/interceptors/usage.interceptor';
 import { CurrentUser } from 'src/common/decorators';
 import { User } from 'src/user/entities/user.entity';
+import { JwtAuthGuard } from 'src/auth/guards/jwt-auth/jwt-auth.guard';
+import { ApiBearerAuth } from '@nestjs/swagger';
 
+@ApiBearerAuth()
+@UseGuards(JwtAuthGuard)
 @Controller('schemes')
 export class SchemesController {
   constructor(private readonly schemesService: SchemesService) {}
