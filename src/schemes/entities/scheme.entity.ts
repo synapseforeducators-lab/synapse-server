@@ -9,7 +9,6 @@ import {
   Index,
   OneToMany,
 } from 'typeorm';
-import { SchemeStatus } from '../enums/scheme-status.enum';
 import { AbstractEntity } from 'src/common/database/abstract.entity';
 import { SchemeOfWorkSection } from './scheme-item.entity';
 import { Subject } from 'src/subject/entities/subject.entity';
