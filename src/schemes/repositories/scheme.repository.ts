@@ -208,7 +208,6 @@ export class SchemeRepository extends AbstractRepository<SchemeOfWork> {
         .leftJoinAndSelect('schemes.term', 'term')
         .select([
           'schemes.id',
-          'schemes.name',
           'items',
           'grade.id',
           'grade.name',
@@ -236,7 +235,6 @@ export class SchemeRepository extends AbstractRepository<SchemeOfWork> {
 
       .select([
         'schemes.id',
-        'schemes.name',
         'items',
         'grade.id',
         'grade.name',
