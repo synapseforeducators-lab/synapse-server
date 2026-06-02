@@ -44,7 +44,7 @@ export class SchemeRepository extends AbstractRepository<SchemeOfWork> {
     try {
       const { items = [], ...schemeOfWorkData } = createSchemeDto;
 
-      let schemeOfWorkItems = items.map((itemDto, index) =>
+      const schemeOfWorkItems = items.map((itemDto, index) =>
         this.entityManager.create(SchemeOfWorkSection, {
           ...itemDto,
           order: itemDto.order ?? index,
@@ -73,14 +73,14 @@ export class SchemeRepository extends AbstractRepository<SchemeOfWork> {
           const curriculum = await transactionalEntityManager.findOne(
             Curriculum,
             {
-              where: { id: createSchemeDto.curriculumId },
+              where: { id: schemeOfWorkData.curriculumId },
             },
           );
           if (!curriculum) {
             throw new BadRequestException('Invalid curriculum specified');
           }
           const term = await transactionalEntityManager.findOne(Term, {
-            where: { id: createSchemeDto.termId },
+            where: { id: schemeOfWorkData.termId },
           });
           if (!term) {
             throw new BadRequestException('Invalid term specified');
