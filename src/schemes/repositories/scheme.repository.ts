@@ -12,8 +12,6 @@ import {
 import { User } from 'src/user/entities/user.entity';
 import { School, SchoolRole } from 'src/schools/entities/school.entity';
 import { SchoolMember } from 'src/schools/entities/school-member.entity';
-import { Grade } from 'src/grades/entities/grade.entity';
-import { Subject } from 'src/subject/entities/subject.entity';
 import { customResponse } from 'src/common/util';
 import { SchemeOfWork } from '../entities/scheme.entity';
 import { CreateSchemeDto } from '../dto/create-scheme.dto';
@@ -46,7 +44,7 @@ export class SchemeRepository extends AbstractRepository<SchemeOfWork> {
     try {
       const { items = [], ...schemeOfWorkData } = createSchemeDto;
 
-      const schemeOfWorkItems = items.map((itemDto, index) =>
+      let schemeOfWorkItems = items.map((itemDto, index) =>
         this.entityManager.create(SchemeOfWorkSection, {
           ...itemDto,
           order: itemDto.order ?? index,
