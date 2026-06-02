@@ -7,6 +7,7 @@ import { CreateSchemeDto } from './dto/create-scheme.dto';
 import { UpdateSchemeDto } from './dto/update-scheme.dto';
 import { User } from 'src/user/entities/user.entity';
 import { SchemeOfWork } from './entities/scheme.entity';
+import { customResponse } from 'src/common/util';
 
 @Injectable()
 export class SchemesService {
@@ -26,7 +27,7 @@ export class SchemesService {
       throw new BadRequestException('unable to get schemes');
     }
 
-    return currRes;
+    return customResponse('Scheme of work created successfully');
   }
 
   async getSchemeById(id: string, user: User): Promise<SchemeOfWork> {
@@ -43,8 +44,18 @@ export class SchemesService {
     id: string,
     user: User,
     updateSchemeDto: UpdateSchemeDto,
-  ): Promise<SchemeOfWork> {
-    return this.schemeRepo.updateScheme(id, user, updateSchemeDto);
+  ) {
+    const currRes = await this.schemeRepo.updateScheme(
+      id,
+      user,
+      updateSchemeDto,
+    );
+
+    if (!currRes) {
+      throw new BadRequestException('unable to update scheme');
+    }
+
+    return customResponse('Scheme of work updated successfully');
   }
 
   async remove(id: string, user: User) {
