@@ -97,18 +97,20 @@ export class SchemeRepository extends AbstractRepository<SchemeOfWork> {
             curriculumId: curriculum.id,
             grade: curriculum.grade,
             gradeId: curriculum.gradeId,
-            term,
+            term: term,
             termId: term.id,
           });
 
           scheme = this.repository.create(newScheme);
+
+          scheme = await this.repository.save(scheme);
         },
       );
 
       return scheme;
     } catch (error) {
-      this.logger.error('Error creating scheme', error);
-      throw new BadRequestException('Error creating scheme');
+      this.logger.error('Error creating scheme of work', error);
+      throw new BadRequestException('Error creating scheme of work ');
     }
   }
 
@@ -130,19 +132,18 @@ export class SchemeRepository extends AbstractRepository<SchemeOfWork> {
 
     if (schoolMember) {
       return await this.entityManager
-        .createQueryBuilder(Curriculum, 'curriculums')
-        .where('curriculums.schoolId = :schoolId', {
+        .createQueryBuilder(SchemeOfWork, 'schemes')
+        .where('schemes.schoolId = :schoolId', {
           schoolId: schoolMember.schoolId,
         })
-        .andWhere('curriculums.is_deleted = :is_deleted', {
+        .andWhere('schemes.is_deleted = :is_deleted', {
           is_deleted: false,
         })
-        .leftJoinAndSelect('curriculums.grade', 'grade')
-        .leftJoinAndSelect('curriculums.subject', 'subject')
-        .leftJoinAndSelect('curriculums.term', 'term')
+        .leftJoinAndSelect('schemes.grade', 'grade')
+        .leftJoinAndSelect('schemes.subject', 'subject')
+        .leftJoinAndSelect('schemes.term', 'term')
         .select([
-          'curriculums.name',
-          'curriculums.id',
+          'schemes.id',
           'grade.id',
           'grade.name',
           'subject.id',
@@ -154,19 +155,18 @@ export class SchemeRepository extends AbstractRepository<SchemeOfWork> {
     }
 
     return await this.entityManager
-      .createQueryBuilder(Curriculum, 'curriculums')
-      .where('curriculums.createdById = :createdById', {
+      .createQueryBuilder(SchemeOfWork, 'schemes')
+      .where('schemes.createdById = :createdById', {
         createdById: user.id,
       })
-      .andWhere('curriculums.is_deleted = :is_deleted', {
+      .andWhere('schemes.is_deleted = :is_deleted', {
         is_deleted: false,
       })
-      .leftJoinAndSelect('curriculums.grade', 'grade')
-      .leftJoinAndSelect('curriculums.subject', 'subject')
-      .leftJoinAndSelect('curriculums.term', 'term')
+      .leftJoinAndSelect('schemes.grade', 'grade')
+      .leftJoinAndSelect('schemes.subject', 'subject')
+      .leftJoinAndSelect('schemes.term', 'term')
       .select([
-        'curriculums.name',
-        'curriculums.id',
+        'schemes.id',
         'grade.id',
         'grade.name',
         'subject.id',
@@ -194,21 +194,21 @@ export class SchemeRepository extends AbstractRepository<SchemeOfWork> {
 
     if (schoolMember) {
       return await this.entityManager
-        .createQueryBuilder(SchemeOfWork, 'scheme')
-        .where('scheme.schoolId = :schoolId AND scheme.id = :id', {
+        .createQueryBuilder(SchemeOfWork, 'schemes')
+        .where('schemes.schoolId = :schoolId AND schemes.id = :id', {
           schoolId: schoolMember.schoolId,
           id,
         })
-        .andWhere('scheme.is_deleted = :is_deleted', {
+        .andWhere('schemes.is_deleted = :is_deleted', {
           is_deleted: false,
         })
-        .leftJoinAndSelect('scheme.grade', 'grade')
-        .leftJoinAndSelect('scheme.items', 'items')
-        .leftJoinAndSelect('scheme.subject', 'subject')
-        .leftJoinAndSelect('scheme.term', 'term')
+        .leftJoinAndSelect('schemes.grade', 'grade')
+        .leftJoinAndSelect('schemes.items', 'items')
+        .leftJoinAndSelect('schemes.subject', 'subject')
+        .leftJoinAndSelect('schemes.term', 'term')
         .select([
-          'scheme.id',
-          'scheme.name',
+          'schemes.id',
+          'schemes.name',
           'items',
           'grade.id',
           'grade.name',
@@ -221,22 +221,22 @@ export class SchemeRepository extends AbstractRepository<SchemeOfWork> {
     }
 
     return await this.entityManager
-      .createQueryBuilder(SchemeOfWork, 'scheme')
-      .where('scheme.createdById = :createdById AND scheme.id = :id ', {
+      .createQueryBuilder(SchemeOfWork, 'schemes')
+      .where('schemes.createdById = :createdById AND schemes.id = :id ', {
         createdById: user.id,
         id,
       })
-      .andWhere('scheme.is_deleted = :is_deleted', {
+      .andWhere('schemes.is_deleted = :is_deleted', {
         is_deleted: false,
       })
-      .leftJoinAndSelect('scheme.grade', 'grade')
-      .leftJoinAndSelect('scheme.items', 'items')
-      .leftJoinAndSelect('scheme.subject', 'subject')
-      .leftJoinAndSelect('scheme.term', 'term')
+      .leftJoinAndSelect('schemes.grade', 'grade')
+      .leftJoinAndSelect('schemes.items', 'items')
+      .leftJoinAndSelect('schemes.subject', 'subject')
+      .leftJoinAndSelect('schemes.term', 'term')
 
       .select([
-        'scheme.id',
-        'scheme.name',
+        'schemes.id',
+        'schemes.name',
         'items',
         'grade.id',
         'grade.name',

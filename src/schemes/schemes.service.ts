@@ -27,7 +27,7 @@ export class SchemesService {
       throw new BadRequestException('unable to get schemes');
     }
 
-    return customResponse('Scheme of work created successfully');
+    return currRes;
   }
 
   async getSchemeById(id: string, user: User): Promise<SchemeOfWork> {
@@ -59,6 +59,8 @@ export class SchemesService {
   }
 
   async remove(id: string, user: User) {
-    return this.schemeRepo.deleteScheme(id, user);
+    await this.schemeRepo.deleteScheme(id, user);
+
+    return customResponse('Scheme of work deleted successfully');
   }
 }

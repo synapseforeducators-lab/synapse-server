@@ -16,7 +16,7 @@ import { Subject } from 'src/subject/entities/subject.entity';
 import { Grade } from 'src/grades/entities/grade.entity';
 import { Term } from 'src/schools/entities/school-term.entity';
 
-@Entity('scheme_of_work')
+@Entity('schemes')
 @Index(['schoolId', 'subjectId', 'gradeId', 'term', 'curriculumId'], {
   unique: true,
 })
@@ -65,18 +65,8 @@ export class SchemeOfWork extends AbstractEntity<SchemeOfWork> {
   @JoinColumn({ name: 'createdById' })
   createdBy: User;
 
-  @Column({
-    type: 'enum',
-    enum: SchemeStatus,
-    default: SchemeStatus.DRAFT,
-  })
-  status: SchemeStatus;
-
   @Column({ type: 'boolean', default: false })
   is_deleted: boolean;
-
-  @Column({ default: false })
-  published: boolean;
 
   @OneToMany(() => SchemeOfWorkSection, (section) => section.scheme, {
     cascade: true,
