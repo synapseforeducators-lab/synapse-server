@@ -239,64 +239,71 @@ export class CurriculumRepository extends AbstractRepository<Curriculum> {
       ])
       .getOne();
   }
+  async getCurriculumForSchemeById(id: string, user: User) {
+    const schoolMember = await this.entityManager.findOne(SchoolMember, {
+      select: { schoolId: true },
+      where: {
+        userId: user.id,
+        role:
+          SchoolRole.ADMIN ||
+          SchoolRole.OWNER ||
+          SchoolRole.HEAD_TEACHER ||
+          SchoolRole.PRINCIPAL ||
+          SchoolRole.VICE_PRINCIPAL ||
+          SchoolRole.DIRECTOR ||
+          SchoolRole.HEAD_OF_DEPARTMENT,
+      },
+    });
 
-  // async findAllForUser(user: User): Promise<Curriculum[]> {
-  //   try {
-  //     if (user.school) {
-  //       return await this.repository.find({
-  //         where: [
-  //           { school: { id: user.school.id } },
-  //           { createdBy: { id: user.id }, school: IsNull() },
-  //         ],
-  //         relations: ['createdBy', 'school'],
-  //         order: { created_at: 'DESC' },
-  //       });
-  //     }
+    if (schoolMember) {
+      return await this.entityManager
+        .createQueryBuilder(Curriculum, 'curriculums')
+        .where('curriculums.schoolId = :schoolId AND curriculums.id = :id', {
+          schoolId: schoolMember.schoolId,
+          id,
+        })
+        .andWhere('curriculums.is_deleted = :is_deleted', {
+          is_deleted: false,
+        })
+        .leftJoinAndSelect('curriculums.grade', 'grade')
+        .leftJoinAndSelect('curriculums.subject', 'subject')
+        .select([
+          'curriculums.id',
+          'curriculums.name',
+          'grade.id',
+          'grade.name',
+          'subject.id',
+          'subject.name',
+        ])
+        .getOne();
+    }
 
-  //     return await this.repository.find({
-  //       where: { createdBy: { id: user.id } },
-  //       relations: ['createdBy', 'school'],
-  //       order: { created_at: 'DESC' },
-  //     });
-  //   } catch (error) {
-  //     this.logger.error('Error fetching curricula', error);
-  //     throw new BadRequestException('Error fetching curricula');
-  //   }
-  // }
+    return await this.entityManager
+      .createQueryBuilder(Curriculum, 'curriculums')
+      .where(
+        'curriculums.createdById = :createdById AND curriculums.id = :id ',
+        {
+          createdById: user.id,
+          id,
+        },
+      )
+      .andWhere('curriculums.is_deleted = :is_deleted', {
+        is_deleted: false,
+      })
+      .leftJoinAndSelect('curriculums.grade', 'grade')
+      .leftJoinAndSelect('curriculums.subject', 'subject')
 
-  /**
-   * Find a single curriculum by id if it is accessible to the user.
-   */
-  // async findOneForUser(id: string, user: User): Promise<Curriculum> {
-  //   try {
-  //     let curriculum: Curriculum | null = null;
+      .select([
+        'curriculums.id',
+        'curriculums.name',
+        'grade.id',
+        'grade.name',
+        'subject.id',
+        'subject.name',
+      ])
+      .getOne();
+  }
 
-  //     if (user.school) {
-  //       curriculum = await this.repository.findOne({
-  //         where: [
-  //           { id, school: { id: user.school.id } },
-  //           { id, createdBy: { id: user.id }, school: IsNull() },
-  //         ],
-  //         relations: ['createdBy', 'school'],
-  //       });
-  //     } else {
-  //       curriculum = await this.repository.findOne({
-  //         where: { id, createdBy: { id: user.id } },
-  //         relations: ['createdBy', 'school'],
-  //       });
-  //     }
-
-  //     if (!curriculum) {
-  //       throw new NotFoundException(`Curriculum ${id} not found`);
-  //     }
-
-  //     return curriculum;
-  //   } catch (error) {
-  //     if (error instanceof NotFoundException) throw error;
-  //     this.logger.error('Error fetching curriculum', error);
-  //     throw new BadRequestException('Error fetching curriculum');
-  //   }
-  // }
 
   /**
    * Update a curriculum. Only the original creator may update it.
