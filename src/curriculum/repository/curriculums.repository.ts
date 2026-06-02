@@ -304,7 +304,6 @@ export class CurriculumRepository extends AbstractRepository<Curriculum> {
       .getOne();
   }
 
-
   /**
    * Update a curriculum. Only the original creator may update it.
    */
