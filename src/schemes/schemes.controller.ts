@@ -21,73 +21,50 @@ import { UsageLimit } from 'src/usage/decorators/usage-limit.decorator';
 import { UsageType } from 'src/usage/enums/usage-type.enum';
 import { UsageLimitGuard } from 'src/usage/guards/usage-limit.guard';
 import { UsageInterceptor } from 'src/usage/interceptors/usage.interceptor';
+import { CurrentUser } from 'src/common/decorators';
+import { User } from 'src/user/entities/user.entity';
 
 @Controller('schemes')
 export class SchemesController {
   constructor(private readonly schemesService: SchemesService) {}
 
+
   @Post()
   @UsageLimit(UsageType.SCHEME)
   @UseGuards(UsageLimitGuard)
   @UseInterceptors(UsageInterceptor)
-  async create(@Req() req, @Body() dto: CreateSchemeDto) {
-    return this.schemesService.create(req.user.id, dto);
+  create(
+    @CurrentUser() user: User,
+    @Body() createCurriculumDto: CreateSchemeDto,
+  ) {
+    return this.schemesService.create(user, createCurriculumDto);
   }
 
   @Get()
-  async findAll(@Query() query: any) {
-    return this.schemesService.findAll(query);
+  getAllSchemes(@CurrentUser() user: User) {
+    return this.schemesService.getAllSchemes(user);
   }
 
   @Get(':id')
-  async findOne(@Param('id') id: string) {
-    return this.schemesService.findOne(id);
+  getSchemeById(@Param('id') id: string, @CurrentUser() user: User) {
+    return this.schemesService.getSchemeById(id, user);
   }
 
   @Patch(':id')
-  async update(
+  update(
     @Param('id') id: string,
-
-    @Req() req,
-
-    @Body() dto: UpdateSchemeDto,
+    @CurrentUser() user: User,
+    @Body() updateSchemeDto: UpdateSchemeDto,
   ) {
-    return this.schemesService.update(id, req.user, dto);
-  }
-
-  @Patch(':id/publish')
-  async publish(
-    @Param('id') id: string,
-
-    @Req() req,
-  ) {
-    return this.schemesService.publish(id, req.user);
-  }
-
-  @Patch(':id/archive')
-  async archive(
-    @Param('id') id: string,
-
-    @Req() req,
-  ) {
-    return this.schemesService.archive(id, req.user);
-  }
-
-  @Post(':id/duplicate')
-  async duplicate(
-    @Param('id') id: string,
-
-    @Req() req,
-  ) {
-    return this.schemesService.duplicate(id, req.user);
+    return this.schemesService.updateSchemeById(
+      id,
+      user,
+      updateSchemeDto,
+    );
   }
 
   @Delete(':id')
-  async remove(
-    @Param('id') id: string,
-
-    @Req() req,
-  ) {
-    return this.schemesService.remove(id, req.user);
+  remove(@Param('id') id: string, @CurrentUser() user: User) {
+    return this.schemesService.remove(id, user);
   }
 }

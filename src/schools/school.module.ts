@@ -12,21 +12,26 @@ import { SchoolInvitationsService } from './school-invitations.service';
 import { SchoolInvitationRepository } from './repository/school-invitation.repository';
 import { EmailModule } from 'src/common/email/email.module';
 import { SchoolInviteController } from './school-invite.controller';
+import { Term } from './entities/school-term.entity';
+import { TermRepository } from './repository/school-terms.repository';
+import { TermsService } from './school-term.service';
 
 @Module({
   imports: [
-    DatabaseModule.forFeature([School, SchoolMember, SchoolInvitation]),
+    DatabaseModule.forFeature([School, SchoolMember, SchoolInvitation, Term]),
     CloudinaryModule,
     EmailModule,
   ],
   controllers: [SchoolController, SchoolInviteController],
   providers: [
     SchoolsService,
+    TermsService,
     SchoolsRepository,
     SchoolMembersRepository,
     SchoolInvitationsService,
     SchoolInvitationRepository,
+    TermRepository,
   ],
-  exports: [SchoolsService, SchoolInvitationsService],
+  exports: [SchoolsService, SchoolInvitationsService, TermsService],
 })
 export class SchoolModule {}

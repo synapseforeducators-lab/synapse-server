@@ -5,59 +5,46 @@ import {
   IsArray,
   ValidateNested,
   IsNumber,
+  IsInt,
+  Min,
 } from 'class-validator';
 
 import { Type } from 'class-transformer';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 
 class WeekDto {
+  @ApiProperty()
   @IsNumber()
   week: number;
 
+  @ApiProperty()
   @IsString()
   topic: string;
 
-  @IsArray()
-  objectives: string[];
+  @ApiProperty()
+  @IsString()
+  objective: string;
 
+  @ApiPropertyOptional()
+  @IsInt()
+  @Min(0)
   @IsOptional()
-  @IsArray()
-  activities?: string[];
-
-  @IsOptional()
-  @IsArray()
-  evaluation?: string[];
-
-  @IsOptional()
-  @IsArray()
-  resources?: string[];
+  order?: number = 0;
 }
 
 export class CreateSchemeDto {
+  @ApiProperty()
   @IsString()
-  subject: string;
+  termId: string;
 
+  @ApiProperty()
   @IsString()
-  className: string;
-
-  @IsString()
-  term: string;
-
-  @IsUUID()
   curriculumId: string;
 
-  @IsUUID()
-  academicSessionId: string;
-
-  @IsOptional()
-  @IsUUID()
-  schoolId?: string;
-
-  @IsOptional()
-  @IsUUID()
-  teamId?: string;
-
+  @ApiProperty({ type: () => WeekDto, isArray: true })
   @IsArray()
   @ValidateNested({ each: true })
   @Type(() => WeekDto)
-  weeks: WeekDto[];
+  @IsOptional()
+  items?: WeekDto[] = [];
 }

@@ -1,7 +1,7 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { CreateGradeDto } from './dto/create-grade.dto';
 import { UpdateGradeDto } from './dto/update-grade.dto';
-import { GradeRepository } from './repository/subjects.repository';
+import { GradeRepository } from './repository/grades.repository';
 import { Grade } from './entities/grade.entity';
 
 @Injectable()
