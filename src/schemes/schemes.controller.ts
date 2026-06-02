@@ -28,7 +28,6 @@ import { User } from 'src/user/entities/user.entity';
 export class SchemesController {
   constructor(private readonly schemesService: SchemesService) {}
 
-
   @Post()
   @UsageLimit(UsageType.SCHEME)
   @UseGuards(UsageLimitGuard)
@@ -56,11 +55,7 @@ export class SchemesController {
     @CurrentUser() user: User,
     @Body() updateSchemeDto: UpdateSchemeDto,
   ) {
-    return this.schemesService.updateSchemeById(
-      id,
-      user,
-      updateSchemeDto,
-    );
+    return this.schemesService.updateSchemeById(id, user, updateSchemeDto);
   }
 
   @Delete(':id')
