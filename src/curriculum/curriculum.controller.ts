@@ -49,14 +49,6 @@ export class CurriculumController {
     return this.curriculumService.getCurriculumById(id, user);
   }
 
-  @Get('/scheme/:id')
-  getCurriculumForSchemeById(
-    @Param('id') id: string,
-    @CurrentUser() user: User,
-  ) {
-    return this.curriculumService.getCurriculumForSchemeById(id, user);
-  }
-
   @Patch(':id')
   update(
     @Param('id') id: string,

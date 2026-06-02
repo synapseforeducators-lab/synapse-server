@@ -40,22 +40,6 @@ export class CurriculumService {
     return currRes;
   }
 
-  async getCurriculumForSchemeById(
-    id: string,
-    user: User,
-  ): Promise<Curriculum> {
-    const currRes = await this.curriculumRepository.getCurriculumForSchemeById(
-      id,
-      user,
-    );
-
-    if (!currRes) {
-      throw new BadRequestException('unable to get curriculum');
-    }
-
-    return currRes;
-  }
-
   async updateCurriculumById(
     id: string,
     user: User,

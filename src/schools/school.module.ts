@@ -15,6 +15,7 @@ import { SchoolInviteController } from './school-invite.controller';
 import { Term } from './entities/school-term.entity';
 import { TermRepository } from './repository/school-terms.repository';
 import { TermsService } from './school-term.service';
+import { TermsController } from './school-term.controller';
 
 @Module({
   imports: [
@@ -22,7 +23,7 @@ import { TermsService } from './school-term.service';
     CloudinaryModule,
     EmailModule,
   ],
-  controllers: [SchoolController, SchoolInviteController],
+  controllers: [SchoolController, SchoolInviteController, TermsController],
   providers: [
     SchoolsService,
     TermsService,
