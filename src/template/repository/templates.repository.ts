@@ -132,9 +132,8 @@ export class TemplatesRepository extends AbstractRepository<Template> {
         'templates.id',
         'templates.name',
         'templates.school_name',
-        // 'sections.label',
-        // 'sections.type',
-        // 'sections.required',
+        // 'sections.title',
+        // 'sections.fields',
         // 'sections.order',
       ])
       .getMany();
@@ -174,9 +173,9 @@ export class TemplatesRepository extends AbstractRepository<Template> {
           'templates.id',
           'templates.name',
           'templates.school_name',
-          'sections.label',
-          'sections.type',
-          'sections.required',
+          'sections.title',
+          'sections.fields',
+          'sections.order',
           'sections.order',
         ])
         .getOne();
@@ -197,9 +196,9 @@ export class TemplatesRepository extends AbstractRepository<Template> {
         'templates.id',
         'templates.name',
         'templates.school_name',
-        'sections.label',
-        'sections.type',
-        'sections.required',
+        'sections.title',
+        'sections.fields',
+        'sections.order',
         'sections.order',
       ])
       .getOne();

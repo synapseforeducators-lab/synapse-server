@@ -8,17 +8,18 @@ import {
   IsString,
   Min,
   ValidateNested,
+  IsArray,
 } from 'class-validator';
-import { SectionTypeEnum } from '../entities/section.entity';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import { SectionTypeEnum } from '../entities/section.entity';
 
-export class CreateTemplateSectionDto {
+export class CreateTemplateFieldDto {
   @ApiProperty()
   @IsString()
   @IsNotEmpty()
   label: string;
 
-  @ApiProperty({ enum: SectionTypeEnum, enumName: 'type' })
+  @ApiProperty({ enum: SectionTypeEnum, enumName: 'SectionType' })
   @IsEnum(SectionTypeEnum)
   type: SectionTypeEnum;
 
@@ -26,6 +27,26 @@ export class CreateTemplateSectionDto {
   @IsBoolean()
   @IsOptional()
   required?: boolean = false;
+
+  @ApiPropertyOptional()
+  @IsInt()
+  @Min(0)
+  @IsOptional()
+  order?: number = 0;
+}
+
+export class CreateTemplateSectionDto {
+  @ApiProperty()
+  @IsString()
+  @IsNotEmpty()
+  title: string;
+
+  @ApiPropertyOptional({ type: () => CreateTemplateFieldDto, isArray: true })
+  @IsArray()
+  @ValidateNested({ each: true })
+  @Type(() => CreateTemplateFieldDto)
+  @IsOptional()
+  fields?: CreateTemplateFieldDto[];
 
   @ApiPropertyOptional()
   @IsInt()

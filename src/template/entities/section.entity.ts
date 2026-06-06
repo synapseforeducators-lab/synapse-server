@@ -13,23 +13,23 @@ export enum SectionTypeEnum {
   TEXTAREA = 'textarea',
 }
 
+export interface TemplateField {
+  type: SectionTypeEnum;
+  label: string;
+  required: boolean;
+  order: number;
+}
+
 @Entity()
 export class TemplateSection extends AbstractEntity<TemplateSection> {
   @Column({ type: 'text', nullable: true })
-  label: string;
-
-  @Column({
-    type: 'enum',
-    enum: SectionTypeEnum,
-    default: SectionTypeEnum.TEXT,
-  })
-  type: SectionTypeEnum;
-
-  @Column({ default: false })
-  required: boolean;
+  title: string;
 
   @Column({ type: 'int', default: 0 })
   order: number;
+
+  @Column({ type: 'json', nullable: true })
+  fields: TemplateField[];
 
   @ManyToOne(() => Template, (template) => template.sections, {
     onDelete: 'CASCADE',
