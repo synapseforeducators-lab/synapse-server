@@ -77,7 +77,7 @@ export class SchoolController {
     );
   }
 
-  @Post('update-school-logo')
+  @Post('update-school-profile')
   @ApiConsumes('multipart/form-data')
   @ApiBody({
     schema: {
@@ -91,9 +91,12 @@ export class SchoolController {
   async updateSchoolLogo(
     @CurrentUser() user: User,
     @UploadedFile(new FileSizeValidationPipe())
+    
     file: Express.Multer.File,
+            @Body() updateSchoolDto?: UpdateSchoolDto,
+
   ) {
-    return await this.schoolService.updateSchoolLogo(user, file);
+    return await this.schoolService.updateSchoolLogo(user, updateSchoolDto, file);
   }
 
   @Post(':schoolId/invitations')

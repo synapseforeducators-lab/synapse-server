@@ -48,6 +48,9 @@ export class School extends AbstractEntity<School> {
   @Column({ nullable: true })
   state: string;
 
+  @Column({ nullable: true, default: false })
+  is_school_verified: boolean;
+
   @Column({ nullable: true })
   country: string;
 

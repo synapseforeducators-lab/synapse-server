@@ -40,25 +40,44 @@ export class SchoolsService {
     return customResponse('School profile added successfully', school);
   }
 
-  async updateSchoolLogo(user: User, file: Express.Multer.File) {
+  async updateSchoolLogo(
+    user: User,
+    updateSchoolDto: UpdateSchoolDto,
+    file: Express.Multer.File,
+  ) {
+    const cleanedDto = Object.fromEntries(
+      Object.entries(updateSchoolDto).filter(
+        ([, value]) => value !== undefined && value?.length,
+      ),
+    );
     const userResp = await this.schoolsRepository.findOne({ owner: user });
 
     if (!userResp) {
       throw new BadRequestException('Reach out to admin to update school logo');
     }
 
-    const imgUrl = await this.cloudinaryService.uploadImageToCloudinary(file);
-    if (!imgUrl) throw new BadRequestException('unable to upload image');
+    // const imgUrl = await this.cloudinaryService.uploadImageToCloudinary(file);
+    // if (!imgUrl) throw new BadRequestException('unable to upload image');
+
+    let imgUrl: string | undefined;
+    if (file) {
+      imgUrl = await this.cloudinaryService.uploadImageToCloudinary(file);
+      if (!imgUrl) throw new BadRequestException('unable to upload image');
+    }
 
     const schoolResp = await this.schoolsRepository.findOneAndUpdate(
       { owner: user },
       {
-        school_logo_url: imgUrl,
+        ...(imgUrl ? { school_logo_url: imgUrl } : {}),
+        ...cleanedDto,
+        is_school_verified: true,
       },
     );
     delete schoolResp.created_at;
     delete schoolResp.updated_at;
     delete schoolResp.id;
+    delete schoolResp.owner;
+    delete schoolResp.ownerId;
 
     return customResponse('Profile photo updated successfully', schoolResp);
   }
