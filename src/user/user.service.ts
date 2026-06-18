@@ -300,13 +300,12 @@ export class UsersService {
     updatePersonalProfileDto: UpdatePersonalProfileDto,
     profile_photo: Express.Multer.File,
   ) {
-    const { file, ...otherInfo } = updatePersonalProfileDto;
     const imgUrl =
       await this.cloudinaryService.uploadImageToCloudinary(profile_photo);
     if (!imgUrl) throw new BadRequestException('unable to upload image');
 
     const cleanedDto = Object.fromEntries(
-      Object.entries(otherInfo).filter(([, value]) => value !== undefined),
+      Object.entries(updatePersonalProfileDto).filter(([, value]) => value !== undefined),
     );
 
     const userWithCompleteProfile = await this.usersRepository.findOne({
