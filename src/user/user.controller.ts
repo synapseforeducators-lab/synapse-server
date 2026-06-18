@@ -2,6 +2,7 @@ import {
   Body,
   Controller,
   Post,
+  Put,
   UploadedFile,
   UseGuards,
   UseInterceptors,
@@ -16,6 +17,7 @@ import { FileSizeValidationPipe } from './pipes/profile-image.pipe';
 import { memoryStorage } from 'multer';
 import {
   UpdatePasswordDto,
+  UpdatePersonalProfileDto,
   UpdateUserProfileDto,
 } from './dto/update-user-details.dto';
 
@@ -50,22 +52,20 @@ export class UsersController {
     return await this.userService.updatePassword(user, updatePasswordDto);
   }
 
-  @Post('update-profile-picture')
+  @Put('update-personal-profile')
   @ApiConsumes('multipart/form-data')
-  @ApiBody({
-    schema: {
-      type: 'object',
-      properties: {
-        file: { type: 'string', format: 'binary' },
-      },
-    },
-  })
+  @ApiBody({ type: UpdatePersonalProfileDto })
   @UseInterceptors(FileInterceptor('file', { storage: memoryStorage() }))
   async updateProfilePicture(
     @CurrentUser() user: User,
+    @Body() updatePersonalProfileDto: UpdatePersonalProfileDto,
     @UploadedFile(new FileSizeValidationPipe())
     file: Express.Multer.File,
   ) {
-    return await this.userService.updateProfilePicture(user, file);
+    return await this.userService.updatePersonalProfile(
+      user,
+      updatePersonalProfileDto,
+      file,
+    );
   }
 }

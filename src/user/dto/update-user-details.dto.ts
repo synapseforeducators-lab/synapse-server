@@ -6,7 +6,7 @@ import {
   IsStrongPassword,
   MinLength,
 } from 'class-validator';
-import { ApiProperty } from '@nestjs/swagger';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { Gender } from '../enums/user.enum';
 
 export class UpdateDobDto {
@@ -43,6 +43,33 @@ export class UpdateUserProfileDto {
   @ApiProperty()
   @IsString()
   phone_number: string;
+}
+
+export class UpdatePersonalProfileDto {
+  @ApiPropertyOptional({ required: false })
+  @IsString()
+  @IsOptional()
+  @MinLength(3)
+  first_name: string;
+
+  @ApiPropertyOptional({ required: false })
+  @IsString()
+  @IsOptional()
+  @MinLength(3)
+  last_name: string;
+
+  @ApiPropertyOptional({ required: false })
+  @IsString()
+  @IsOptional()
+  @MinLength(3)
+  postal_address: string;
+
+  @ApiPropertyOptional({
+    type: 'string',
+    format: 'binary',
+    required: false,
+  })
+  file: any;
 }
 
 export class UpdatePasswordDto {

@@ -22,6 +22,7 @@ import { VerificationCodeUserCase } from './enums/user.enum';
 import { UpdateEmailDto } from './dto/update-email.dto';
 import {
   UpdatePasswordDto,
+  UpdatePersonalProfileDto,
   UpdateUserProfileDto,
 } from './dto/update-user-details.dto';
 import { EmailService } from 'src/common/email/email.service';
@@ -294,14 +295,36 @@ export class UsersService {
     return userResponse;
   }
 
-  async updateProfilePicture(user: User, file: Express.Multer.File) {
-    console.log(user, file);
-    const imgUrl = await this.cloudinaryService.uploadImageToCloudinary(file);
+  async updatePersonalProfile(
+    user: User,
+    updatePersonalProfileDto: UpdatePersonalProfileDto,
+    profile_photo: Express.Multer.File,
+  ) {
+    const { file, ...otherInfo } = updatePersonalProfileDto;
+    const imgUrl =
+      await this.cloudinaryService.uploadImageToCloudinary(profile_photo);
     if (!imgUrl) throw new BadRequestException('unable to upload image');
+
+    const cleanedDto = Object.fromEntries(
+      Object.entries(otherInfo).filter(([, value]) => value !== undefined),
+    );
+
+    const userWithCompleteProfile = await this.usersRepository.findOne({
+      id: user?.email,
+    });
+
+    if (!userWithCompleteProfile) {
+      throw new BadRequestException('Something went wrong, try again');
+    }
+
+    if (!userWithCompleteProfile.is_complete_profile) {
+      throw new BadRequestException('Complete your profile');
+    }
 
     const userResponse = await this.usersRepository.findOneAndUpdate(
       { id: user.id },
       {
+        ...cleanedDto,
         profile_photo_url: imgUrl,
       },
     );
@@ -309,7 +332,7 @@ export class UsersService {
     delete userResponse.updated_at;
     delete userResponse.id;
 
-    return customResponse('Profile photo updated successfully', userResponse);
+    return customResponse('Profile updated successfully', userResponse);
   }
 
   // async updateProfile(updateProfileDto: UpdateProfileDto, user: User) {
