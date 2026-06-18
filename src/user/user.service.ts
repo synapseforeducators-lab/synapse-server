@@ -300,16 +300,19 @@ export class UsersService {
     updatePersonalProfileDto: UpdatePersonalProfileDto,
     profile_photo: Express.Multer.File,
   ) {
+    console.log(updatePersonalProfileDto);
     const imgUrl =
       await this.cloudinaryService.uploadImageToCloudinary(profile_photo);
     if (!imgUrl) throw new BadRequestException('unable to upload image');
 
     const cleanedDto = Object.fromEntries(
-      Object.entries(updatePersonalProfileDto).filter(([, value]) => value !== undefined),
+      Object.entries(updatePersonalProfileDto).filter(
+        ([, value]) => value !== undefined,
+      ),
     );
 
     const userWithCompleteProfile = await this.usersRepository.findOne({
-      id: user?.email,
+      id: user?.id,
     });
 
     if (!userWithCompleteProfile) {
@@ -330,6 +333,8 @@ export class UsersService {
     delete userResponse.created_at;
     delete userResponse.updated_at;
     delete userResponse.id;
+    delete userResponse.password;
+    delete userResponse.verification_token;
 
     return customResponse('Profile updated successfully', userResponse);
   }
