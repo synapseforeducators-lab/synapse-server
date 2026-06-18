@@ -60,7 +60,7 @@ export class UsersController {
     @CurrentUser() user: User,
     @Body() updatePersonalProfileDto: UpdatePersonalProfileDto,
     @UploadedFile(new FileSizeValidationPipe())
-    file: Express.Multer.File,
+    file?: Express.Multer.File,
   ) {
     return await this.userService.updatePersonalProfile(
       user,

@@ -49,19 +49,19 @@ export class UpdatePersonalProfileDto {
   @ApiPropertyOptional({ required: false })
   @IsString()
   @IsOptional()
-  @MinLength(3)
+  @MinLength(3, { validateIf: (_, value) => value.length })
   first_name: string;
 
   @ApiPropertyOptional({ required: false })
   @IsString()
   @IsOptional()
-  @MinLength(3)
+  @MinLength(3, { validateIf: (_, value) => value.length })
   last_name: string;
 
   @ApiPropertyOptional({ required: false })
   @IsString()
   @IsOptional()
-  @MinLength(3)
+  @MinLength(3, { validateIf: (_, value) => value.length })
   postal_address: string;
 
   @ApiPropertyOptional({
