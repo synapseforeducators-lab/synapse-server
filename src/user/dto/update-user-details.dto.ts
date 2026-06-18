@@ -26,25 +26,21 @@ export class UpdateGenderDto {
 
 export class UpdateUserProfileDto {
   @ApiProperty()
-  @IsOptional()
   @IsString()
   @MinLength(3)
   first_name: string;
 
   @ApiProperty()
-  @IsOptional()
   @IsString()
   @MinLength(3)
   last_name: string;
 
   @ApiProperty()
-  @IsOptional()
   @IsString()
   @MinLength(3)
   postal_address: string;
 
   @ApiProperty()
-  @IsOptional()
   @IsString()
   phone_number: string;
 }

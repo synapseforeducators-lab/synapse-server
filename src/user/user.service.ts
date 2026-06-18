@@ -270,6 +270,15 @@ export class UsersService {
         ([, value]) => value !== undefined,
       ),
     );
+
+    const userWithPhoneResponse = await this.usersRepository.findOne({
+      phone_number: updateUserProfileDto?.phone_number,
+    });
+
+    if (userWithPhoneResponse) {
+      throw new BadRequestException('Phone number already exist');
+    }
+
     const userResponse = await this.usersRepository.findOneAndUpdate(
       { id: user.id },
       { ...cleanedDto, is_complete_profile: true },
