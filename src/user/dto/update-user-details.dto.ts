@@ -44,7 +44,7 @@ export class UpdateUserProfileDto {
   @IsString()
   phone_number: string;
 
-    @ApiProperty()
+  @ApiProperty()
   @IsOptional()
   @IsString()
   @ApiProperty({ enum: ProfileSetupEnum })
