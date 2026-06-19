@@ -51,6 +51,9 @@ export class User extends AbstractEntity<User> {
   @Column({ type: 'boolean', nullable: false, default: false })
   is_complete_profile: boolean;
 
+  @Column({ type: 'boolean', nullable: false, default: false })
+  is_individual_only: boolean;
+
   @BeforeInsert()
   async updateName() {
     this.first_name = this.first_name.toLowerCase().trim();

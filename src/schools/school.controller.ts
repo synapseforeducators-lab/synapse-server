@@ -9,6 +9,7 @@ import {
   Param,
   Query,
   ParseUUIDPipe,
+  Put,
 } from '@nestjs/common';
 import { CreateSchoolDto } from './dto/create-school.dto';
 import { UpdateSchoolDto } from './dto/update-school.dto';
@@ -77,26 +78,21 @@ export class SchoolController {
     );
   }
 
-  @Post('update-school-profile')
+  @Put('update-school-details')
   @ApiConsumes('multipart/form-data')
-  @ApiBody({
-    schema: {
-      type: 'object',
-      properties: {
-        file: { type: 'string', format: 'binary' },
-      },
-    },
-  })
+  @ApiBody({ type: UpdateSchoolDto })
   @UseInterceptors(FileInterceptor('file', { storage: memoryStorage() }))
   async updateSchoolLogo(
     @CurrentUser() user: User,
     @UploadedFile(new FileSizeValidationPipe())
-    
     file: Express.Multer.File,
-            @Body() updateSchoolDto?: UpdateSchoolDto,
-
+    @Body() updateSchoolDto?: UpdateSchoolDto,
   ) {
-    return await this.schoolService.updateSchoolLogo(user, updateSchoolDto, file);
+    return await this.schoolService.updateSchoolProfileWithImage(
+      user,
+      updateSchoolDto,
+      file,
+    );
   }
 
   @Post(':schoolId/invitations')

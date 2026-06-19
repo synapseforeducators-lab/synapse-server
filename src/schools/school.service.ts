@@ -40,7 +40,7 @@ export class SchoolsService {
     return customResponse('School profile added successfully', school);
   }
 
-  async updateSchoolLogo(
+  async updateSchoolProfileWithImage(
     user: User,
     updateSchoolDto: UpdateSchoolDto,
     file: Express.Multer.File,
@@ -70,7 +70,6 @@ export class SchoolsService {
       {
         ...(imgUrl ? { school_logo_url: imgUrl } : {}),
         ...cleanedDto,
-        is_school_verified: true,
       },
     );
     delete schoolResp.created_at;

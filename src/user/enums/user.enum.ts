@@ -3,6 +3,11 @@ export enum Gender {
   FEMALE = 'FEMALE',
 }
 
+export enum ProfileSetupEnum {
+  SCHOOL = 'SCHOOL',
+  INDIVIDUAL = 'INDIVIDUAL',
+}
+
 export enum IdVerificationType {
   BVN = 'BVN',
   NIN = 'NIN',

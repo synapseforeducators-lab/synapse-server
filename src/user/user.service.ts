@@ -18,7 +18,7 @@ import { customResponse, otpGenerator } from 'src/common/util';
 import { TokenPayload } from 'src/common/interfaces';
 import { UserLoginDto } from 'src/auth/dto';
 import { ConfigService } from '@nestjs/config';
-import { VerificationCodeUserCase } from './enums/user.enum';
+import { ProfileSetupEnum, VerificationCodeUserCase } from './enums/user.enum';
 import { UpdateEmailDto } from './dto/update-email.dto';
 import {
   UpdatePasswordDto,
@@ -282,7 +282,14 @@ export class UsersService {
 
     const userResponse = await this.usersRepository.findOneAndUpdate(
       { id: user.id },
-      { ...cleanedDto, is_complete_profile: true },
+      {
+        ...cleanedDto,
+        is_complete_profile: true,
+        is_individual_only:
+          updateUserProfileDto.profile === ProfileSetupEnum.INDIVIDUAL
+            ? true
+            : false,
+      },
     );
 
     if (!userResponse)

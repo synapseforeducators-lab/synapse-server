@@ -46,4 +46,11 @@ export class UpdateSchoolDto {
   @IsOptional()
   @IsString()
   country?: string;
+
+  @ApiPropertyOptional({
+    type: 'string',
+    format: 'binary',
+    required: false,
+  })
+  file?: any;
 }

@@ -7,7 +7,7 @@ import {
   MinLength,
 } from 'class-validator';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { Gender } from '../enums/user.enum';
+import { Gender, ProfileSetupEnum } from '../enums/user.enum';
 
 export class UpdateDobDto {
   @ApiProperty()
@@ -43,6 +43,13 @@ export class UpdateUserProfileDto {
   @ApiProperty()
   @IsString()
   phone_number: string;
+
+    @ApiProperty()
+  @IsOptional()
+  @IsString()
+  @ApiProperty({ enum: ProfileSetupEnum })
+  @IsEnum(ProfileSetupEnum)
+  profile: ProfileSetupEnum;
 }
 
 export class UpdatePersonalProfileDto {

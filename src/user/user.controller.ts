@@ -44,6 +44,13 @@ export class UsersController {
     return await this.userService.updateUserProfile(user, updateUserProfileDto);
   }
 
+  @Post('teach-profile')
+  async ForTeacherOnly(
+    @CurrentUser() user: User,
+  ) {
+    return await this.userService.teacherProfileOnly(user);
+  }
+
   @Post('update-password')
   async UpdatePassword(
     @CurrentUser() user: User,

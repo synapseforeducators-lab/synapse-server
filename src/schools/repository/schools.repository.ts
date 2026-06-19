@@ -38,6 +38,7 @@ export class SchoolsRepository extends AbstractRepository<School> {
           ownerId: user.id,
           owner: user,
           ...createSchoolDto,
+          is_school_verified: true,
         });
 
         await transactionalEntityManager.save(SchoolMember, {
