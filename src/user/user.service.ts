@@ -299,7 +299,7 @@ export class UsersService {
     delete userResponse.created_at;
     delete userResponse.updated_at;
     delete userResponse.id;
-    return userResponse;
+    return customResponse('Profile setup succesfully', { user: userResponse });
   }
 
   async updatePersonalProfile(
