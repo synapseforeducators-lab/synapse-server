@@ -281,6 +281,13 @@ export class UsersService {
       throw new BadRequestException('Phone number already exist');
     }
 
+    console.log('user profile payload', {
+      ...cleanedDto,
+      is_complete_profile: true,
+      is_individual_only:
+        profile === ProfileSetupEnum.INDIVIDUAL ? true : false,
+    });
+
     const userResponse = await this.usersRepository.findOneAndUpdate(
       { id: user.id },
       {

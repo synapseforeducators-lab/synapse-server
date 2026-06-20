@@ -118,6 +118,10 @@ export class SchoolsService {
       throw new BadRequestException('Something went wrong');
     }
 
+    console.log('school profile log', {
+      school: schoolRes,
+      user: updateSchoolMember,
+    });
     return customResponse('School profile details updated successfully', {
       school: schoolRes,
       user: updateSchoolMember,
