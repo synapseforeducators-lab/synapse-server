@@ -266,8 +266,9 @@ export class UsersService {
     user: User,
     updateUserProfileDto: UpdateUserProfileDto,
   ) {
+    const { profile, ...otherUserProfileDto } = updateUserProfileDto;
     const cleanedDto = Object.fromEntries(
-      Object.entries(updateUserProfileDto).filter(
+      Object.entries(otherUserProfileDto).filter(
         ([, value]) => value !== undefined,
       ),
     );
@@ -286,9 +287,7 @@ export class UsersService {
         ...cleanedDto,
         is_complete_profile: true,
         is_individual_only:
-          updateUserProfileDto.profile === ProfileSetupEnum.INDIVIDUAL
-            ? true
-            : false,
+          profile === ProfileSetupEnum.INDIVIDUAL ? true : false,
       },
     );
 
