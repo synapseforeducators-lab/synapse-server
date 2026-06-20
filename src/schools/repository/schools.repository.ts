@@ -21,7 +21,27 @@ export class SchoolsRepository extends AbstractRepository<School> {
   ) {
     super(schoolsRepository, entityManager);
   }
+  async validateSchoolMemberProfile(userId: string) {
+    const result = await this.entityManager.update(
+      User,
+      { id: userId },
+      { is_individual_only: true },
+    );
 
+    if (!result.affected) {
+      throw new NotFoundException('User not found');
+    }
+
+    const user = await this.entityManager.findOne(User, {
+      where: { id: userId },
+    });
+
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+
+    return user;
+  }
   async createSchool(user: User, createSchoolDto: CreateSchoolDto) {
     let school: School;
 

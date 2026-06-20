@@ -90,16 +90,38 @@ export class SchoolsService {
       );
     }
 
+    const updateSchoolMember =
+      await this.schoolsRepository.validateSchoolMemberProfile(userResp.id);
+
+    if (!updateSchoolMember) {
+      throw new BadRequestException('Something went wrong');
+    }
+
     const schoolRes = await this.schoolsRepository.findOneAndUpdate(
       { owner: user },
       { ...updateSchoolDto },
     );
 
+    delete schoolRes.id;
+    delete schoolRes.owner;
+    delete schoolRes.ownerId;
+    delete schoolRes.created_at;
+    delete schoolRes.updated_at;
+    delete updateSchoolMember.password;
+    delete updateSchoolMember.created_at;
+    delete updateSchoolMember.updated_at;
+    delete updateSchoolMember.verification_token;
+    delete updateSchoolMember.id;
+    delete updateSchoolMember.email_verified;
+
     if (!schoolRes) {
       throw new BadRequestException('Something went wrong');
     }
 
-    return customResponse('School profile details updated successfully');
+    return customResponse('School profile details updated successfully', {
+      school: schoolRes,
+      user: updateSchoolMember,
+    });
   }
 
   async findSchoolByUser(userId: string) {
