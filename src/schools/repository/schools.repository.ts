@@ -47,23 +47,18 @@ export class SchoolsRepository extends AbstractRepository<School> {
 
     await this.entityManager.transaction(
       async (transactionalEntityManager: EntityManager) => {
-        const userRes = await transactionalEntityManager.findOne(User, {
-          where: { id: user.id },
-        });
-        if (!userRes) {
-          throw new NotFoundException('User not found');
-        }
+        const userRes = await this.validateSchoolMemberProfile(user.id);
 
         school = await transactionalEntityManager.save(School, {
-          ownerId: user.id,
-          owner: user,
+          ownerId: userRes.id,
+          owner: userRes,
           ...createSchoolDto,
           is_school_verified: true,
         });
 
         await transactionalEntityManager.save(SchoolMember, {
           schoolId: school.id,
-          userId: user.id,
+          userId: userRes.id,
           role: SchoolRole.OWNER,
           status: SchoolMemberStatus.ACTIVE,
           active: true,
