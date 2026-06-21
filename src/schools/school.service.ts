@@ -36,6 +36,8 @@ export class SchoolsService {
     delete school.created_at;
     delete school.updated_at;
     delete school.id;
+    delete school.owner;
+    delete school.ownerId;
 
     return customResponse('School profile added successfully', school);
   }
