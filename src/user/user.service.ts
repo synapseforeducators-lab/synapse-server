@@ -262,7 +262,7 @@ export class UsersService {
     );
   }
 
-  async updateUserProfile(
+  async createPersonalUserProfile(
     user: User,
     updateUserProfileDto: UpdateUserProfileDto,
   ) {

@@ -36,12 +36,15 @@ export class UsersController {
   //   // return await this.buyerService.verifyNIN(user, updateNinDto);
   // }
 
-  @Post('update-profile')
+  @Post('create-personal-profile')
   async UpdateUserProfile(
     @CurrentUser() user: User,
     @Body() updateUserProfileDto: UpdateUserProfileDto,
   ) {
-    return await this.userService.updateUserProfile(user, updateUserProfileDto);
+    return await this.userService.createPersonalUserProfile(
+      user,
+      updateUserProfileDto,
+    );
   }
 
   @Post('update-password')
