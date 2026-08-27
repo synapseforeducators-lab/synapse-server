@@ -1,7 +1,9 @@
-import { BeforeInsert, Column, Entity, Index } from 'typeorm';
+import { BeforeInsert, Column, Entity, Index, OneToMany } from 'typeorm';
 import { AbstractEntity } from '../../common';
 import { Role } from '../enums/role.enum';
 import { VerificationCodeUserCase } from '../enums/user.enum';
+import { School } from 'src/schools/entities/school.entity';
+import { Support } from 'src/support/entities/support.entity';
 
 @Entity()
 export class User extends AbstractEntity<User> {
@@ -53,6 +55,15 @@ export class User extends AbstractEntity<User> {
 
   @Column({ type: 'boolean', nullable: false, default: false })
   is_individual_only: boolean;
+
+  @Column({ type: 'boolean', nullable: false, default: false })
+  is_school_admin: boolean;
+
+  @OneToMany(() => School, (school) => school.owner)
+  schools: School[];
+
+  @OneToMany(() => Support, (support) => support.user)
+  supports: Support[];
 
   @BeforeInsert()
   async updateName() {

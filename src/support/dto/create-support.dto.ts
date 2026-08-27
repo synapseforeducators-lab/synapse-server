@@ -1,5 +1,5 @@
-import { ApiProperty } from '@nestjs/swagger';
-import { IsEnum, IsString } from 'class-validator';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import { IsEnum, IsOptional, IsString } from 'class-validator';
 import { COMPLAINT_ENUM } from '../entities/support.entity';
 
 export class CreateSupportDto {
@@ -15,6 +15,7 @@ export class CreateSupportDto {
   @IsString()
   description: string;
 
-  @ApiProperty({ type: 'string', format: 'binary' })
-  file: any;
+  @ApiPropertyOptional({ type: 'string', format: 'binary' })
+  @IsOptional()
+  file?: any;
 }

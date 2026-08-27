@@ -5,8 +5,9 @@ import { SchemeOfWork } from 'src/schemes/entities/scheme.entity';
 import { School } from 'src/schools/entities/school.entity';
 import { Template } from 'src/template/entities/template.entity';
 import { User } from 'src/user/entities/user.entity';
-import { Column, JoinColumn, ManyToOne } from 'typeorm';
+import { Column, Entity, JoinColumn, ManyToOne } from 'typeorm';
 
+@Entity('notes')
 export class Note extends AbstractEntity<Note> {
   @Column()
   schemeOfWorkSectionId: string;

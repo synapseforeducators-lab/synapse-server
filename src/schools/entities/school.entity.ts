@@ -57,7 +57,7 @@ export class School extends AbstractEntity<School> {
   @Column()
   ownerId: string;
 
-  @ManyToOne(() => User)
+  @ManyToOne(() => User, (user) => user.schools)
   @JoinColumn({ name: 'ownerId' })
   owner: User;
 

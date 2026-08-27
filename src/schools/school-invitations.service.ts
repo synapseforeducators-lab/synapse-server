@@ -68,10 +68,20 @@ export class SchoolInvitationsService {
     }
 
     const { data, error } = await this.emailService.send({
-      // to: dto.email,
-      to: 'synapseforeducators@gmail.com',
+      to: dto.email,
       subject: `${school.school_name} - Invitation to Join`,
-      html: `Hi ${dto.first_name}, <br/> <br/> You have been invited to join ${school.school_name}:  <br/><br/> <a href="${this.configService.get('FRONTEND_URL')}/accept-invitation?token=${invitation.token}&email=${dto.email}&first_name=${dto.first_name}&last_name=${dto.last_name}">Accept Invitation</a> <a href="${this.configService.get('FRONTEND_URL')}/cancel-invitation?invitationId=${invitation.id}">Cancel Invitation</a>`,
+      template: {
+        id: 'school-invitation',
+        variables: {
+          accept_url:
+            "${this.configService.get('FRONTEND_URL')}/accept-invitation?token=${invitation.token}&email=${dto.email}&first_name=${dto.first_name}&last_name=${dto.last_name}",
+
+          cancel_url:
+            "${this.configService.get('FRONTEND_URL')}/cancel-invitation?invitationId=${invitation.id}",
+          first_name: dto.first_name,
+          school_name: school.school_name,
+        },
+      },
     });
 
     console.log({ data, error, invitation });

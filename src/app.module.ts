@@ -20,6 +20,8 @@ import { NotesModule } from './notes/notes.module';
 import { UsageModule } from './usage/usage.module';
 import { AcademicSessionsModule } from './academic-sessions/academic-sessions.module';
 import { GradesModule } from './grades/grades.module';
+import { DashboardModule } from './dashboard/dashboard.module';
+import { BackupModule } from './backup/backup.module';
 
 @Module({
   imports: [
@@ -56,6 +58,8 @@ import { GradesModule } from './grades/grades.module';
     UsageModule,
     AcademicSessionsModule,
     GradesModule,
+    DashboardModule,
+    BackupModule,
   ],
   controllers: [AppController],
   providers: [AppService],

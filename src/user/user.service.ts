@@ -207,7 +207,7 @@ export class UsersService {
 
     console.log({ email, password });
 
-    if (!user) throw new BadRequestException('Invalid login Credentials');
+    if (!user) throw new BadRequestException("User doesn't exist, sign up");
 
     const isPasswordValid = await bcrypt.compare(password, user.password);
 
@@ -233,10 +233,14 @@ export class UsersService {
       const { data, error } = await this.emailService.send({
         to: user.email,
         subject: 'Signup Verfication Code',
-        html: `Hi ${user.first_name}, <br/> <br/> Enter the confirmation code you to very your account:  <br/><br/> <h2> ${code} </h2> `,
+        template: {
+          id: 'email-verification',
+          variables: {
+            code: code,
+            first_name: user.first_name,
+          },
+        },
       });
-
-      console.log({ data, error });
 
       return customResponse('Email not verified, verify email', {
         SESSION: 'VERIFY_SIGNUP',
@@ -277,7 +281,10 @@ export class UsersService {
       phone_number: updateUserProfileDto?.phone_number,
     });
 
-    if (userWithPhoneResponse) {
+    if (
+      userWithPhoneResponse &&
+      userWithPhoneResponse.phone_number !== user.phone_number
+    ) {
       throw new BadRequestException('Phone number already exist');
     }
 

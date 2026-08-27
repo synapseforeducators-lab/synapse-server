@@ -3,6 +3,21 @@ import { CreateEmailDto } from './dto/create-email.dto';
 import { Resend } from 'resend';
 import { ConfigService } from '@nestjs/config';
 
+interface EmailVariables {
+  [key: string]: string | number;
+}
+
+interface EmailTemplate {
+  id: string;
+  variables: EmailVariables;
+}
+
+interface EmailSendOptions {
+  to: string;
+  subject: string;
+  template: EmailTemplate;
+}
+
 @Injectable()
 export class EmailService {
   private resend: Resend;
@@ -12,14 +27,14 @@ export class EmailService {
     this.resend = new Resend(apiKey);
   }
 
-  async send(createEmailDto: CreateEmailDto) {
-    const { to, subject, html } = createEmailDto;
+  async send(createEmailDto: EmailSendOptions) {
+    const { to, subject, template } = createEmailDto;
 
     return await this.resend.emails.send({
-      from: 'onboarding@resend.dev',
+      from: 'synapseforeducators@gmail.com',
       to,
       subject,
-      html,
+      template: template,
     });
   }
 }

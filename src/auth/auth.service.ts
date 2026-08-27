@@ -45,7 +45,13 @@ export class AuthService {
     const { data, error } = await this.emailService.send({
       to: user.email,
       subject: 'Signup Verfication Code',
-      html: `Hi ${user.first_name}, <br/> <br/> Enter the confirmation code you to very your account:  <br/><br/> <h2> ${code} </h2> `,
+      template: {
+        id: 'email-verification',
+        variables: {
+          code: code,
+          first_name: user.first_name,
+        },
+      },
     });
 
     console.log({ data, error });
@@ -103,7 +109,13 @@ export class AuthService {
     const { data, error } = await this.emailService.send({
       to: user.email,
       subject: 'Signup Verfication Code',
-      html: `Hi ${user.first_name}, <br/> <br/> Enter the confirmation code you to very your account:  <br/><br/> <h2> ${code} </h2> `,
+      template: {
+        id: 'email-verification',
+        variables: {
+          code: code,
+          first_name: user.first_name,
+        },
+      },
     });
 
     console.log({ data, error });

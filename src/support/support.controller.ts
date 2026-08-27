@@ -35,10 +35,9 @@ export class SupportController {
   @UseInterceptors(FileInterceptor('file', { storage: memoryStorage() }))
   create(
     @CurrentUser() user: User,
-    @UploadedFile()
-    file: Express.Multer.File,
-
     @Body() createSupportDto: CreateSupportDto,
+    @UploadedFile()
+    file?: Express.Multer.File,
   ) {
     return this.supportService.create(user, createSupportDto, file);
   }

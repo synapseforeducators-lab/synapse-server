@@ -17,12 +17,15 @@ export class SupportService {
     createSupportDto: CreateSupportDto,
     file: Express.Multer.File,
   ) {
-    const imgUrl = await this.cloudinaryService.uploadImageToCloudinary(file);
-    if (!imgUrl) throw new BadRequestException('unable to upload image');
+    let imgUrl: string;
+    if (file) {
+      imgUrl = await this.cloudinaryService.uploadImageToCloudinary(file);
+    }
+    if (file && !imgUrl)
+      throw new BadRequestException('unable to upload image');
 
     const support = new Support({
       attachment_url: imgUrl,
-      userId: user.id,
       user: user,
       ...createSupportDto,
     });

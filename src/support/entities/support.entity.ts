@@ -3,8 +3,14 @@ import { User } from 'src/user/entities/user.entity';
 import { Column, Entity, JoinColumn, ManyToOne } from 'typeorm';
 
 export enum COMPLAINT_ENUM {
-  PAYMENT = 'PAYMENT',
-  NOTE = 'NOTE',
+  FAILED_PAYMENT = 'failed_payment',
+  BILLING_ISSUE = 'billing_issue',
+  ACCOUNT_ACCESS = 'account_access',
+  FEATURE_REQUEST = 'feature_request',
+  BUG_REPORT = 'bug_report',
+  DATA_LOSS = 'data_loss',
+  PERFORMANCE = 'performance',
+  OTHER = 'other',
 }
 
 @Entity()
@@ -27,10 +33,7 @@ export class Support extends AbstractEntity<Support> {
   @Column({ type: 'text', nullable: true })
   attachment_url?: string;
 
-  @Column()
-  userId: string;
-
-  @ManyToOne(() => User)
-  @JoinColumn({ name: 'userId' })
+  @ManyToOne(() => User, (user) => user.supports)
+  @JoinColumn()
   user: User;
 }
