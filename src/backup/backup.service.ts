@@ -185,7 +185,9 @@ export class BackupService {
       query.andWhere('schemes.createdById = :userId', { userId: user.id });
     }
 
-    const schemes = await query.orderBy('schemes.created_at', 'DESC').getRawMany();
+    const schemes = await query
+      .orderBy('schemes.created_at', 'DESC')
+      .getRawMany();
 
     return {
       name: 'Schemes',
@@ -583,9 +585,7 @@ export class BackupService {
     const dataRows = sheet.rows
       .map(
         (row) =>
-          `<Row>${row
-            .map((value) => this.buildCellXml(value))
-            .join('')}</Row>`,
+          `<Row>${row.map((value) => this.buildCellXml(value)).join('')}</Row>`,
       )
       .join('');
 
