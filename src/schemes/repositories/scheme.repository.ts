@@ -86,6 +86,41 @@ export class SchemeRepository extends AbstractRepository<SchemeOfWork> {
             throw new BadRequestException('Invalid term specified');
           }
 
+          const duplicateSchemeQuery = transactionalEntityManager
+            .createQueryBuilder(SchemeOfWork, 'scheme')
+            .where('scheme.subjectId = :subjectId', {
+              subjectId: curriculum.subjectId,
+            })
+            .andWhere('scheme.gradeId = :gradeId', {
+              gradeId: curriculum.gradeId,
+            })
+            .andWhere('scheme.termId = :termId', {
+              termId: term.id,
+            })
+            .andWhere('scheme.is_deleted = :isDeleted', {
+              isDeleted: false,
+            });
+
+          if (schoolExist?.id) {
+            duplicateSchemeQuery.andWhere('scheme.schoolId = :schoolId', {
+              schoolId: schoolExist.id,
+            });
+          } else {
+            duplicateSchemeQuery
+              .andWhere('scheme.createdById = :createdById', {
+                createdById: user.id,
+              })
+              .andWhere('scheme.schoolId IS NULL');
+          }
+
+          const existingScheme = await duplicateSchemeQuery.getOne();
+
+          if (existingScheme) {
+            throw new BadRequestException(
+              'A scheme of work already exists for this subject, class/grade, and term. Please edit the previous scheme of work instead.',
+            );
+          }
+
           const newScheme = new SchemeOfWork({
             school: schoolExist ?? null,
             schoolId: schoolExist?.id ?? null,
@@ -109,6 +144,9 @@ export class SchemeRepository extends AbstractRepository<SchemeOfWork> {
 
       return scheme;
     } catch (error) {
+      if (error instanceof BadRequestException) {
+        throw error;
+      }
       this.logger.error('Error creating scheme of work', error);
       throw new BadRequestException('Error creating scheme of work ');
     }

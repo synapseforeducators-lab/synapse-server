@@ -56,9 +56,6 @@ export class User extends AbstractEntity<User> {
   @Column({ type: 'boolean', nullable: false, default: false })
   is_individual_only: boolean;
 
-  @Column({ type: 'boolean', nullable: false, default: false })
-  is_school_admin: boolean;
-
   @OneToMany(() => School, (school) => school.owner)
   schools: School[];
 

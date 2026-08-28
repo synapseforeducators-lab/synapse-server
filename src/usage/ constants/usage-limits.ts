@@ -3,10 +3,10 @@ import { UsageType } from '../enums/usage-type.enum';
 
 export const USAGE_LIMITS = {
   [BillingPlan.FREE]: {
-    [UsageType.SCHEME]: 2,
-    [UsageType.NOTE]: 2,
+    [UsageType.SCHEME]: 5,
+    [UsageType.NOTE]: 5,
     [UsageType.CURRICULUM]: 2,
-    [UsageType.TEMPLATE]: 2,
+    [UsageType.TEMPLATE]: 10,
     [UsageType.AI_NOTE_GENERATION]: 0,
   },
 
