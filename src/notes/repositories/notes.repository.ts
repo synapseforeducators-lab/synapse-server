@@ -110,13 +110,16 @@ export class NotesRepository extends AbstractRepository<Note> {
             });
           }
 
-          const scheme = await transactionalEntityManager.findOne(SchemeOfWork, {
-            where: {
-              id: createNoteDto.schemeId,
-              is_deleted: false,
+          const scheme = await transactionalEntityManager.findOne(
+            SchemeOfWork,
+            {
+              where: {
+                id: createNoteDto.schemeId,
+                is_deleted: false,
+              },
+              relations: ['createdBy', 'school'],
             },
-            relations: ['createdBy', 'school'],
-          });
+          );
 
           if (!scheme) {
             throw new BadRequestException('Invalid scheme of work specified');
