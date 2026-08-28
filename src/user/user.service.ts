@@ -242,6 +242,8 @@ export class UsersService {
         },
       });
 
+      console.log(data, error);
+
       return customResponse('Email not verified, verify email', {
         SESSION: 'VERIFY_SIGNUP',
       });

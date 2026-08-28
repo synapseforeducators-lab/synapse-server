@@ -1,5 +1,4 @@
 import { Injectable } from '@nestjs/common';
-import { CreateEmailDto } from './dto/create-email.dto';
 import { Resend } from 'resend';
 import { ConfigService } from '@nestjs/config';
 
