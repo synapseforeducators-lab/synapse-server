@@ -1,7 +1,6 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { CreateNoteDto } from './dto/create-note.dto';
 import { User } from 'src/user/entities/user.entity';
-import { Note } from './entities/note.entity';
 import { NotesRepository } from './repositories/notes.repository';
 import { UpdateNoteDto } from './dto/update-note.dto';
 import { customResponse } from 'src/common/util';
