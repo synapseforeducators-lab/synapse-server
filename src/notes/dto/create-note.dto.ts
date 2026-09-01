@@ -14,6 +14,10 @@ export class CreateNoteDto {
   @IsString()
   templateId: string;
 
+  @ApiProperty()
+  @IsString()
+  duration: string;
+
   @ApiPropertyOptional({
     type: [Object],
     default: [],

@@ -23,6 +23,12 @@ type NoteDetail = {
   templateId: string;
   schoolId: string | null;
   teacher: string;
+  subject: string | null;
+  class: string | null;
+  grade: string | null;
+  week: string;
+  term: string | null;
+  duration: string | null;
   contents: any[];
   scheme: {
     id: string;
@@ -101,6 +107,12 @@ export class NotesService {
       templateId: note.templateId,
       schoolId: note.schoolId ?? null,
       teacher,
+      subject: note.scheme.subject?.name ?? null,
+      class: note.scheme.grade?.name ?? null,
+      grade: note.scheme.grade?.name ?? null,
+      week: `Wk ${(note.schemeOfWorkSection.order ?? 0) + 1}`,
+      term: note.scheme.term?.name ?? null,
+      duration: note.duration ?? null,
       contents: note.contents ?? [],
       scheme: {
         id: note.scheme.id,

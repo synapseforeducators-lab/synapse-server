@@ -216,6 +216,9 @@ export class NotesRepository extends AbstractRepository<Note> {
     const query = this.entityManager
       .createQueryBuilder(Note, 'notes')
       .leftJoinAndSelect('notes.scheme', 'scheme')
+      .leftJoinAndSelect('scheme.subject', 'subject')
+      .leftJoinAndSelect('scheme.grade', 'grade')
+      .leftJoinAndSelect('scheme.term', 'term')
       .leftJoinAndSelect('notes.schemeOfWorkSection', 'schemeOfWorkSection')
       .leftJoinAndSelect('notes.template', 'template')
       .leftJoinAndSelect('notes.curriculum', 'curriculum')

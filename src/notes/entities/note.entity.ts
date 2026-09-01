@@ -56,6 +56,9 @@ export class Note extends AbstractEntity<Note> {
   @Column({ type: 'boolean', default: false })
   is_deleted: boolean;
 
+  @Column({ type: 'text', nullable: true })
+  duration: string;
+
   @Column({ type: 'json', nullable: true })
   contents: any[];
 }
